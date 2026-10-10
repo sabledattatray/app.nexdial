@@ -304,7 +304,7 @@ export default function ReportDashboardPage() {
         secondaryMeasureField: secMeasure,
         aggregation: (tw.aggregation === "avg" ? "average" : tw.aggregation || "sum") as WidgetDefinition["aggregation"],
         gridSpan: tw.gridSpan === "full" ? "full" : "half",
-        topN: tw.topN || (tw.type === "bar" || tw.type === "donut" ? 10 : undefined),
+        topN: tw.topN || (tw.type === "donut" ? 7 : tw.type === "bar" ? 10 : undefined),
         whyThisChart: `Configured from ${template.name} architecture.`,
       };
     });
@@ -357,7 +357,7 @@ export default function ReportDashboardPage() {
         secondaryMeasureField: tw.secondaryMeasureField,
         aggregation: (tw.aggregation === "avg" ? "average" : tw.aggregation || "sum") as WidgetDefinition["aggregation"],
         gridSpan: tw.gridSpan === "full" ? "full" : "half",
-        topN: tw.topN || (tw.type === "bar" || tw.type === "donut" ? 10 : undefined),
+        topN: tw.topN || (tw.type === "donut" ? 7 : tw.type === "bar" ? 10 : undefined),
         whyThisChart: `Loaded from ${template.name}`,
       }));
 

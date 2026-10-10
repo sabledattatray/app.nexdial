@@ -473,33 +473,32 @@ export function WidgetCard({
           },
         },
         legend: {
-          bottom: 2,
-          type: "scroll",
-          textStyle: { color: textColor, fontSize: 11 },
-          itemWidth: 10,
-          itemHeight: 10,
-          formatter: (name: string) => {
-            const item = pieData.find((p) => p.name === name);
-            return item ? `${name} (${formatChartValue(item.value)})` : name;
-          },
+          show: false, // Hidden to prevent collision with bottom slice callout labels
         },
         series: [
           {
             type: "pie",
-            radius: ["36%", "62%"],
-            center: ["50%", "45%"],
+            radius: ["36%", "58%"],
+            center: ["50%", "50%"],
             avoidLabelOverlap: true,
+            minAngle: 12,
             itemStyle: {
               borderRadius: 6,
               borderColor: isDark ? "#0f172a" : "#ffffff",
               borderWidth: 2,
+            },
+            labelLayout: {
+              hideOverlap: false,
+              moveOverlap: "shiftY",
             },
             label: {
               show: true,
               position: "outside",
               formatter: (params: unknown) => {
                 const p = params as { name?: string; value?: number; percent?: number };
-                return `${p.name || ""}\n${formatChartValue(Number(p.value || 0))} (${p.percent || 0}%)`;
+                const rawName = p.name || "";
+                const truncatedName = rawName.length > 15 ? `${rawName.slice(0, 13)}…` : rawName;
+                return `${truncatedName}\n${formatChartValue(Number(p.value || 0))} (${p.percent || 0}%)`;
               },
               fontSize: 11,
               fontWeight: 600,
@@ -508,7 +507,7 @@ export function WidgetCard({
             },
             labelLine: {
               show: true,
-              length: 12,
+              length: 10,
               length2: 12,
               smooth: true,
               lineStyle: {
@@ -838,7 +837,7 @@ export function WidgetCard({
           </div>
         ) : (
           /* ECharts Canvas Visual */
-          <div ref={containerRef} className="w-full h-[280px]" />
+          <div ref={containerRef} className="w-full h-[300px]" />
         )}
       </CardContent>
 
