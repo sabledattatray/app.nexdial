@@ -76,7 +76,23 @@ export function recommendDashboardWidgets(
     gridSpan: "quarter",
   });
 
-  // 2. Time-Series Trend (Date + Measure)
+  // 2. Interactive Dimension Slicer (Instant Drill-Down Filter at TOP of Canvas)
+  if (categoricalFields.length > 0) {
+    const slicerDim =
+      categoricalFields.find((f) => f.distinctCount >= 2 && f.distinctCount <= 12) ||
+      categoricalFields[0];
+    widgets.push({
+      id: `widget_slicer_${slicerDim.id}`,
+      type: "slicer",
+      title: `Filter by ${slicerDim.name}`,
+      dimensionField: slicerDim.name,
+      aggregation: "count",
+      whyThisChart: `Interactive slicer allows one-click filtering of all dashboard charts across "${slicerDim.name}" segments.`,
+      gridSpan: "half",
+    });
+  }
+
+  // 3. Time-Series Trend (Date + Measure)
   if (dateFields.length > 0 && measureFields.length > 0) {
     const dateField = dateFields[0];
     const measureField = measureFields[0];
@@ -94,7 +110,7 @@ export function recommendDashboardWidgets(
     });
   }
 
-  // 3. Category Comparison Bar Chart
+  // 4. Category Comparison Bar Chart
   if (categoricalFields.length > 0 && measureFields.length > 0) {
     const catField = categoricalFields[0];
     const measureField = measureFields[0];
@@ -112,7 +128,7 @@ export function recommendDashboardWidgets(
     });
   }
 
-  // 4. Composition Donut Chart (for low cardinality category <= 6)
+  // 5. Composition Donut Chart (for low cardinality category <= 6)
   const lowCardField = categoricalFields.find(
     (f) => f.distinctCount >= 2 && f.distinctCount <= 6
   ) || categoricalFields[1];
@@ -132,7 +148,7 @@ export function recommendDashboardWidgets(
     });
   }
 
-  // 5. Relationship / Correlation Scatter Plot (2 Measures)
+  // 6. Relationship / Correlation Scatter Plot (2 Measures)
   if (measureFields.length >= 2) {
     const m1 = measureFields[0];
     const m2 = measureFields[1];
@@ -145,22 +161,6 @@ export function recommendDashboardWidgets(
       secondaryMeasureField: m2.name,
       aggregation: "sum",
       whyThisChart: `Scatter plot maps two continuous numeric measures ("${m1.name}" vs "${m2.name}") to evaluate statistical correlation.`,
-      gridSpan: "half",
-    });
-  }
-
-  // 6. Interactive Dimension Slicer (Instant Drill-Down Filter)
-  if (categoricalFields.length > 0) {
-    const slicerDim =
-      categoricalFields.find((f) => f.distinctCount >= 2 && f.distinctCount <= 12) ||
-      categoricalFields[0];
-    widgets.push({
-      id: `widget_slicer_${slicerDim.id}`,
-      type: "slicer",
-      title: `Filter by ${slicerDim.name}`,
-      dimensionField: slicerDim.name,
-      aggregation: "count",
-      whyThisChart: `Interactive slicer allows one-click filtering of all dashboard charts across "${slicerDim.name}" segments.`,
       gridSpan: "half",
     });
   }

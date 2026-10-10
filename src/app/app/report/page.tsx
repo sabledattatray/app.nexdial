@@ -51,6 +51,7 @@ import {
   ChevronDown,
   FileCode,
   Layers,
+  Sliders,
 } from "lucide-react";
 import { TemplateSwitcherBar } from "@/components/templates/TemplateSwitcherBar";
 import { TemplateSlideOverDrawer } from "@/components/templates/TemplateSlideOverDrawer";
@@ -137,13 +138,17 @@ export default function ReportDashboardPage() {
     return applyReportFilters(rows, filters);
   }, [rows, filters]);
 
-  // Split widgets into KPIs and Visualizations
+  // Split widgets into KPIs, Slicers, and Visualizations
   const kpiWidgets = useMemo(
     () => widgets.filter((w) => w.type === "kpi"),
     [widgets]
   );
+  const slicerWidgets = useMemo(
+    () => widgets.filter((w) => w.type === "slicer"),
+    [widgets]
+  );
   const visualWidgets = useMemo(
-    () => widgets.filter((w) => w.type !== "kpi"),
+    () => widgets.filter((w) => w.type !== "kpi" && w.type !== "slicer"),
     [widgets]
   );
 
@@ -211,6 +216,32 @@ export default function ReportDashboardPage() {
   };
 
   // Widget manipulation handlers
+  // Quick Add Slicer Handler
+  const handleAddSlicerForField = (fieldName: string) => {
+    const newSlicer: WidgetDefinition = {
+      id: `widget_slicer_${fieldName}_${Date.now()}`,
+      type: "slicer",
+      title: `Filter by ${fieldName}`,
+      dimensionField: fieldName,
+      aggregation: "count",
+      gridSpan: "half",
+      whyThisChart: `Interactive slicer allows one-click filtering across ${fieldName} segments.`,
+    };
+    setCustomWidgets((prev) => [newSlicer, ...(prev ?? defaultWidgets)]);
+    setHasUnsavedChanges(true);
+    setSaveSuccessMessage(`Added "${newSlicer.title}" slicer to dashboard!`);
+    setTimeout(() => setSaveSuccessMessage(null), 3000);
+  };
+
+  const handleQuickAddSlicer = () => {
+    if (!profile) return;
+    const catFields = profile.fields.filter(
+      (f) => f.role === "dimension" || f.userType === "categorical"
+    );
+    const chosenField = catFields[0]?.name || profile.fields[0]?.name || "Category";
+    handleAddSlicerForField(chosenField);
+  };
+
   const handleOpenAddWidget = () => {
     setEditingWidget(null);
     setInspectorOpen(true);
@@ -677,6 +708,17 @@ export default function ReportDashboardPage() {
             </Button>
 
             <Button
+              size="sm"
+              variant="outline"
+              onClick={handleQuickAddSlicer}
+              className="gap-1.5 shadow-2xs border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+              title="Add an interactive dimensional slicer to filter all visuals"
+            >
+              <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>+ Add Slicer</span>
+            </Button>
+
+            <Button
               variant="outline"
               size="sm"
               onClick={() => setSaveModalOpen(true)}
@@ -943,6 +985,92 @@ export default function ReportDashboardPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* 3.5 Interactive Dimensional Slicers Shelf */}
+      {slicerWidgets.length > 0 ? (
+        <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800">
+                <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-800 dark:text-slate-200 print:text-slate-900">
+                Interactive Slicers & Filters
+              </h2>
+              <Badge variant="accent" className="text-[10px]">
+                1-Click Cross Filter
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">
+                Click pills to filter all dashboard visuals
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleQuickAddSlicer}
+                className="h-6 text-[10px] gap-1 px-2"
+              >
+                <Plus className="w-3 h-3" />
+                <span>Add Slicer</span>
+              </Button>
+            </div>
+          </div>
+
+          <div className={`grid grid-cols-1 ${slicerWidgets.length > 1 ? "lg:grid-cols-2" : ""} gap-4`}>
+            {slicerWidgets.map((slicer) => (
+              <WidgetCard
+                key={slicer.id}
+                spec={slicer}
+                rows={rows}
+                colorTheme={activeColorTheme}
+                activeFilters={filters}
+                onFilterSelect={handleSlicerFilterToggle}
+                onEdit={handleOpenEditWidget}
+                onDuplicate={handleDuplicateWidget}
+                onDelete={handleDeleteWidget}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
+        profile && profile.fields.some((f) => f.role === "dimension" || f.userType === "categorical") && (
+          <div className="p-3.5 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-800/80 bg-indigo-50/50 dark:bg-indigo-950/20 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
+                <Sliders className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800 dark:text-slate-200">
+                  Interactive Dimensional Slicers
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Add 1-click filter pills to drill down into your dashboard by category.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {profile.fields
+                .filter((f) => f.role === "dimension" || f.userType === "categorical")
+                .slice(0, 3)
+                .map((f) => (
+                  <Button
+                    key={f.id}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleAddSlicerForField(f.name)}
+                    className="text-xs h-7 gap-1 bg-white dark:bg-slate-900 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 shadow-2xs"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>+ Slice by {f.name}</span>
+                  </Button>
+                ))}
+            </div>
+          </div>
+        )
       )}
 
       {/* 4. Deterministic Statistical Insights Section (PRD Section 7.7) */}

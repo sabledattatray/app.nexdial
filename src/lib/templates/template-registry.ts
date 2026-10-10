@@ -118,6 +118,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
     widgets: [
       { id: "f1", type: "kpi", title: "Total Actual Spend", measureField: "Actual_Spend", aggregation: "sum" },
       { id: "f2", type: "kpi", title: "Budget Allocated", measureField: "Budget_Allocated", aggregation: "sum" },
+      { id: "f_slicer", type: "slicer", title: "Filter by Department", dimensionField: "Department", gridSpan: "half" },
       { id: "f_waterfall", type: "waterfall", title: "Department Spend Variance Walk", dimensionField: "Department", measureField: "Actual_Spend", gridSpan: "full" },
       { id: "f3", type: "horizontal_bar", title: "Spend by Department", dimensionField: "Department", measureField: "Actual_Spend" },
       { id: "f4", type: "line", title: "Monthly Expense Trend", dimensionField: "Date", measureField: "Actual_Spend" },
@@ -164,6 +165,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "i1", type: "kpi", title: "Current Stock Units", measureField: "Current_Stock", aggregation: "sum" },
       { id: "i2", type: "kpi", title: "Reorder Threshold Units", measureField: "Reorder_Level", aggregation: "sum" },
       { id: "i3", type: "kpi", title: "Average Unit Cost", measureField: "Unit_Cost", aggregation: "sum" },
+      { id: "i_slicer", type: "slicer", title: "Filter by Warehouse", dimensionField: "Warehouse", gridSpan: "half" },
       { id: "i4", type: "bar", title: "Stock by Item Name", dimensionField: "Item_Name", measureField: "Current_Stock", topN: 8 },
       { id: "i5", type: "donut", title: "Warehouse Stock Distribution", dimensionField: "Warehouse", measureField: "Current_Stock" },
       { id: "i6", type: "scatter", title: "Stock vs Reorder Correlation", measureField: "Current_Stock", secondaryMeasureField: "Reorder_Level" },
@@ -184,6 +186,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "ec1", type: "kpi", title: "Total E-Commerce Revenue", measureField: "Revenue", aggregation: "sum" },
       { id: "ec2", type: "kpi", title: "Sessions Traffic", measureField: "Sessions", aggregation: "sum" },
       { id: "ec3", type: "kpi", title: "Completed Checkouts", measureField: "Checkouts", aggregation: "sum" },
+      { id: "ec_slicer", type: "slicer", title: "Filter by Device", dimensionField: "Device_Type", gridSpan: "half" },
       { id: "ec_funnel", type: "funnel", title: "Traffic Pipeline by Device", dimensionField: "Device_Type", measureField: "Sessions", gridSpan: "half" },
       { id: "ec_gauge", type: "gauge", title: "Conversion Attainment", measureField: "Conversion_Rate", gridSpan: "half" },
       { id: "ec4", type: "line", title: "Revenue Timeline", dimensionField: "Date", measureField: "Revenue", gridSpan: "full" },
@@ -206,6 +209,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
     widgets: [
       { id: "h1", type: "kpi", title: "Total Employees", measureField: "Overtime_Hours", aggregation: "count" },
       { id: "h2", type: "kpi", title: "Total Overtime Hours", measureField: "Overtime_Hours", aggregation: "sum" },
+      { id: "h_slicer", type: "slicer", title: "Filter by Department", dimensionField: "Department", gridSpan: "half" },
       { id: "h3", type: "bar", title: "Headcount by Department", dimensionField: "Department", measureField: "Overtime_Hours" },
       { id: "h4", type: "donut", title: "Role Distribution", dimensionField: "Role", measureField: "Overtime_Hours" },
     ],
@@ -224,6 +228,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
     widgets: [
       { id: "o1", type: "kpi", title: "Total Tickets Handled", measureField: "Resolution_Hours", aggregation: "count" },
       { id: "o2", type: "kpi", title: "Total Resolution Hours", measureField: "Resolution_Hours", aggregation: "sum" },
+      { id: "o_slicer", type: "slicer", title: "Filter by Priority", dimensionField: "Priority", gridSpan: "half" },
       { id: "o3", type: "line", title: "Resolution Hours by Date", dimensionField: "Created_Date", measureField: "Resolution_Hours", gridSpan: "full" },
       { id: "o4", type: "bar", title: "Tickets by Agent", dimensionField: "Agent", measureField: "Resolution_Hours" },
       { id: "o5", type: "donut", title: "SLA Status Ratio", dimensionField: "SLA_Status", measureField: "Resolution_Hours" },
@@ -244,6 +249,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "m1", type: "kpi", title: "Total Campaign Spend", measureField: "Spend", aggregation: "sum" },
       { id: "m2", type: "kpi", title: "Total Impressions", measureField: "Impressions", aggregation: "sum" },
       { id: "m3", type: "kpi", title: "Total Conversions", measureField: "Conversions", aggregation: "sum" },
+      { id: "m_slicer", type: "slicer", title: "Filter by Channel", dimensionField: "Channel", gridSpan: "half" },
       { id: "m4", type: "bar", title: "Spend by Channel", dimensionField: "Channel", measureField: "Spend" },
       { id: "m5", type: "donut", title: "Conversions by Channel", dimensionField: "Channel", measureField: "Conversions" },
       { id: "m6", type: "scatter", title: "Spend vs Conversions", measureField: "Spend", secondaryMeasureField: "Conversions" },
@@ -263,6 +269,7 @@ export const MIS_TEMPLATES: MISTemplate[] = [
     widgets: [
       { id: "p1", type: "kpi", title: "Total Tasks", measureField: "Estimated_Hours", aggregation: "count" },
       { id: "p2", type: "kpi", title: "Estimated Hours", measureField: "Estimated_Hours", aggregation: "sum" },
+      { id: "p_slicer", type: "slicer", title: "Filter by Status", dimensionField: "Status", gridSpan: "half" },
       { id: "p3", type: "bar", title: "Hours by Project", dimensionField: "Project_Name", measureField: "Estimated_Hours" },
       { id: "p4", type: "donut", title: "Status Breakdown", dimensionField: "Status", measureField: "Estimated_Hours" },
     ],

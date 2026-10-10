@@ -150,15 +150,20 @@ function WidgetInspectorForm({
           Data Binding
         </p>
 
-        {/* Dimension Field (only for charts with categories/dates) */}
+        {/* Dimension Field (for charts with categories/dates, and slicers) */}
         {type !== "kpi" && (
           <div>
             <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Dimension (Category / Date):
+              {type === "slicer" ? "Filter Dimension (Category Column to Slice):" : "Dimension (Category / Date):"}
             </label>
             <Select
               value={dimensionField}
-              onChange={(e) => setDimensionField(e.target.value)}
+              onChange={(e) => {
+                setDimensionField(e.target.value);
+                if (type === "slicer" && (title === "Custom Chart" || title.startsWith("Filter by "))) {
+                  setTitle(`Filter by ${e.target.value}`);
+                }
+              }}
               className="w-full text-xs"
             >
               {fields.map((f) => (
@@ -167,55 +172,62 @@ function WidgetInspectorForm({
                 </option>
               ))}
             </Select>
+            {type === "slicer" && (
+              <p className="text-[11px] text-slate-500 mt-1">
+                Generates interactive 1-click filter pills for each unique value in this column.
+              </p>
+            )}
           </div>
         )}
 
-        {/* Primary Measure Field */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Measure (Metric):
-            </label>
-            <Select
-              value={measureField}
-              onChange={(e) => setMeasureField(e.target.value)}
-              className="w-full text-xs"
-            >
-              {measureFields.map((f) => (
-                <option key={f.id} value={f.name}>
-                  {f.name} ({f.userType})
-                </option>
-              ))}
-              {/* Fallback to all fields if none detected as measure */}
-              {measureFields.length === 0 &&
-                fields.map((f) => (
+        {/* Primary Measure Field (not needed for Slicers) */}
+        {type !== "slicer" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Measure (Metric):
+              </label>
+              <Select
+                value={measureField}
+                onChange={(e) => setMeasureField(e.target.value)}
+                className="w-full text-xs"
+              >
+                {measureFields.map((f) => (
                   <option key={f.id} value={f.name}>
-                    {f.name}
+                    {f.name} ({f.userType})
                   </option>
                 ))}
-            </Select>
-          </div>
+                {/* Fallback to all fields if none detected as measure */}
+                {measureFields.length === 0 &&
+                  fields.map((f) => (
+                    <option key={f.id} value={f.name}>
+                      {f.name}
+                    </option>
+                  ))}
+              </Select>
+            </div>
 
-          {/* Aggregation Function */}
-          <div>
-            <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Aggregation:
-            </label>
-            <Select
-              value={aggregation}
-              onChange={(e) => setAggregation(e.target.value as AggregationType)}
-              className="w-full text-xs"
-            >
-              <option value="sum">SUM</option>
-              <option value="average">AVERAGE</option>
-              <option value="count">COUNT (Rows)</option>
-              <option value="distinct_count">DISTINCT COUNT</option>
-              <option value="min">MINIMUM</option>
-              <option value="max">MAXIMUM</option>
-              <option value="median">MEDIAN</option>
-            </Select>
+            {/* Aggregation Function */}
+            <div>
+              <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Aggregation:
+              </label>
+              <Select
+                value={aggregation}
+                onChange={(e) => setAggregation(e.target.value as AggregationType)}
+                className="w-full text-xs"
+              >
+                <option value="sum">SUM</option>
+                <option value="average">AVERAGE</option>
+                <option value="count">COUNT (Rows)</option>
+                <option value="distinct_count">DISTINCT COUNT</option>
+                <option value="min">MINIMUM</option>
+                <option value="max">MAXIMUM</option>
+                <option value="median">MEDIAN</option>
+              </Select>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Secondary Measure Field (only for Scatter) */}
         {type === "scatter" && (
