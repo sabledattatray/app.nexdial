@@ -373,8 +373,56 @@ export default function ReportDashboardPage() {
         </div>
       )}
 
+      {/* Dedicated Executive Boardroom Print Header (Visible ONLY when printing) */}
+      <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 break-inside-avoid">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-900 text-white font-bold text-lg print:border print:border-indigo-900">
+              <BarChart3 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-black tracking-tight uppercase text-slate-900">
+                  Nexdial OpenMIS
+                </span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
+                  Boardroom Report
+                </span>
+              </div>
+              <h1 className="text-xl font-black text-slate-900 mt-0.5 tracking-tight">
+                {reportTitle || (profile ? `${profile.metadata.name} Report` : "Executive MIS Dashboard")}
+              </h1>
+            </div>
+          </div>
+          <div className="text-right space-y-1">
+            <div className="inline-block px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase bg-amber-50 text-amber-900 border border-amber-300 rounded">
+              Confidential • Executive Distribution Only
+            </div>
+            <div className="text-[11px] text-slate-600 font-mono">
+              Generated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+            </div>
+          </div>
+        </div>
+
+        {/* Executive Meta Bar */}
+        <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-xs text-slate-700">
+          <div className="flex items-center gap-4">
+            <span><strong>Source:</strong> {profile.metadata.name}</span>
+            <span>•</span>
+            <span><strong>Scope:</strong> {filteredRows.length.toLocaleString()} of {rows.length.toLocaleString()} active rows</span>
+            <span>•</span>
+            <span><strong>Dimensions:</strong> {profile.fields.length} columns</span>
+            <span>•</span>
+            <span><strong>Data Health Score:</strong> {profile.qualityScore}% verified</span>
+          </div>
+          <div className="text-[11px] text-slate-500 font-mono">
+            {filters.length > 0 ? `${filters.length} active filter(s) applied` : "Full dataset (unfiltered)"}
+          </div>
+        </div>
+      </div>
+
       {/* 1. Summary Header (PRD Section 7.5, 7.8 & 18) */}
-      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs min-w-0">
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs min-w-0 print:hidden">
         <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 min-w-0">
           <div className="space-y-1.5 min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -579,17 +627,17 @@ export default function ReportDashboardPage() {
 
       {/* 3. Executive KPI Cards Row (PRD Section 7.5) */}
       {kpiWidgets.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
               Executive Key Performance Indicators
             </h2>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 print:text-slate-500">
               {kpiWidgets.length} metrics calculated from active rows
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 break-inside-avoid print:break-inside-avoid">
             {kpiWidgets.map((kpi) => (
               <WidgetCard
                 key={kpi.id}
@@ -606,22 +654,22 @@ export default function ReportDashboardPage() {
 
       {/* 4. Deterministic Statistical Insights Section (PRD Section 7.7) */}
       {deterministicInsights.length > 0 && (
-        <section className="space-y-3">
+        <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
                 Deterministic Business Insights
               </h2>
-              <Badge variant="outline" className="text-[10px]">
+              <Badge variant="outline" className="text-[10px] print:border-slate-300 print:text-slate-700">
                 Mathematical Proof
               </Badge>
             </div>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 print:text-slate-500">
               Traceable formulas • Zero hallucination
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 break-inside-avoid print:break-inside-avoid">
             {deterministicInsights.map((insight) => {
               const isWarning = insight.severity === "warning";
               const isPositive = insight.severity === "positive";
@@ -629,12 +677,12 @@ export default function ReportDashboardPage() {
               return (
                 <Card
                   key={insight.id}
-                  className={`p-4.5 flex flex-col justify-between transition-all hover:shadow-xs ${
+                  className={`p-4.5 flex flex-col justify-between transition-all hover:shadow-xs break-inside-avoid print:break-inside-avoid print:shadow-none print:bg-white ${
                     isWarning
-                      ? "border-amber-200 dark:border-amber-900/60 bg-amber-50/20 dark:bg-amber-950/10"
+                      ? "border-amber-200 dark:border-amber-900/60 bg-amber-50/20 dark:bg-amber-950/10 print:border-amber-300"
                       : isPositive
-                      ? "border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/10"
-                      : "border-slate-200 dark:border-slate-800"
+                      ? "border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/10 print:border-emerald-300"
+                      : "border-slate-200 dark:border-slate-800 print:border-slate-300"
                   }`}
                 >
                   <div className="space-y-2">
@@ -647,30 +695,30 @@ export default function ReportDashboardPage() {
                         ) : (
                           <Info className="w-4 h-4 text-indigo-500 shrink-0" />
                         )}
-                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 print:text-slate-900">
                           {insight.title}
                         </span>
                       </div>
                       <Badge
                         variant={isWarning ? "warning" : "default"}
-                        className="text-[10px] capitalize"
+                        className="text-[10px] capitalize print:border print:border-slate-300"
                       >
                         {insight.type.replace("_", " ")}
                       </Badge>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed print:text-slate-700">
                       {insight.description}
                     </p>
                   </div>
 
-                  <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                  <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/80 print:border-slate-200 flex items-center justify-between text-xs">
                     <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">
                       {insight.computedValue}
                     </span>
                     <button
                       onClick={() => setSelectedInsight(insight)}
-                      className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 text-[11px]"
+                      className="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 text-[11px] print:hidden"
                     >
                       <HelpCircle className="w-3 h-3" />
                       <span>Formula Evidence</span>
@@ -687,14 +735,14 @@ export default function ReportDashboardPage() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
               Interactive Visualizations
             </h2>
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-[10px] print:border-slate-300 print:text-slate-700">
               ECharts Engine
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 print:hidden">
             <Button
               size="sm"
               variant="outline"
@@ -714,7 +762,7 @@ export default function ReportDashboardPage() {
               return (
                 <div
                   key={spec.id}
-                  className={isFullSpan ? "col-span-1 lg:col-span-2" : "col-span-1"}
+                  className={`${isFullSpan ? "col-span-1 lg:col-span-2" : "col-span-1"} break-inside-avoid print:break-inside-avoid`}
                 >
                   <WidgetCard
                     spec={spec}
@@ -741,6 +789,22 @@ export default function ReportDashboardPage() {
           </div>
         )}
       </section>
+
+      {/* Dedicated Executive Boardroom Print Footer (Visible ONLY when printing) */}
+      <div className="hidden print:flex items-center justify-between pt-4 mt-8 border-t border-slate-300 text-[10px] text-slate-500 break-inside-avoid">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-slate-700">Nexdial OpenMIS</span>
+          <span>•</span>
+          <span>100% Client-Side Private Analytics</span>
+          <span>•</span>
+          <span>Zero Cloud Telemetry • No Data Leaves Browser</span>
+          <span>•</span>
+          <span>app.nexdial.io</span>
+        </div>
+        <div className="text-right font-mono text-slate-600">
+          Strictly Confidential • CFO / Executive Management Information System
+        </div>
+      </div>
 
       {/* Modal: Widget Inspector (Add / Edit Widget) */}
       <WidgetInspectorModal

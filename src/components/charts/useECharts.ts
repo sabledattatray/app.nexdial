@@ -37,8 +37,18 @@ export function useECharts({ options }: UseEChartsOptions) {
 
     resizeObserver.observe(containerRef.current);
 
+    // Responsive redraw for browser print dialog (e.g. landscape full-width PDF)
+    const handlePrintResize = () => {
+      chartInstanceRef.current?.resize();
+    };
+
+    window.addEventListener("beforeprint", handlePrintResize);
+    window.addEventListener("afterprint", handlePrintResize);
+
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener("beforeprint", handlePrintResize);
+      window.removeEventListener("afterprint", handlePrintResize);
     };
   }, [options]);
 

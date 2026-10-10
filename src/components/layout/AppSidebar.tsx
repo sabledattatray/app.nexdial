@@ -57,7 +57,7 @@ export function AppSidebar() {
   ];
 
   return (
-    <aside className="w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between shrink-0 h-[calc(100vh-4rem)] sticky top-16 hidden md:flex">
+    <aside className="w-64 border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between shrink-0 h-[calc(100vh-4rem)] sticky top-16 hidden md:flex print:hidden">
       {/* Navigation Links */}
       <div className="p-4 space-y-1">
         <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">

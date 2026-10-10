@@ -274,12 +274,12 @@ export function WidgetCard({
   if (spec.type === "kpi") {
     const kpi = processedData as { kpiValue: number; count: number } | null;
     return (
-      <Card className="p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+      <Card className="p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[180px]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[180px] print:text-slate-700">
             {spec.title}
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 print:hidden">
             <button
               onClick={() => setWhyModalOpen(true)}
               className="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition-colors"
@@ -383,22 +383,22 @@ export function WidgetCard({
   const chartData = processedData as { categories?: string[]; values?: number[]; scatterPoints?: [number, number][] } | null;
 
   return (
-    <Card className="flex flex-col justify-between overflow-hidden shadow-2xs">
+    <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white">
       <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-row items-center justify-between space-y-0 pb-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800">
+          <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 print:border print:border-slate-200">
             {getWidgetIcon()}
           </div>
           <div>
-            <CardTitle className="text-sm font-semibold">{spec.title}</CardTitle>
+            <CardTitle className="text-sm font-semibold print:text-slate-900">{spec.title}</CardTitle>
             {spec.subtitle && (
-              <CardDescription className="text-[11px]">{spec.subtitle}</CardDescription>
+              <CardDescription className="text-[11px] print:text-slate-500">{spec.subtitle}</CardDescription>
             )}
           </div>
         </div>
 
         {/* Controls: Why this chart + Data Table toggle + Inspector actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 print:hidden">
           {spec.topN && (
             <Badge variant="outline" className="text-[10px] hidden sm:inline-flex mr-1">
               Top {spec.topN}

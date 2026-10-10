@@ -136,13 +136,17 @@ export function GlobalFilterBar({
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-3 sm:p-4 shadow-2xs space-y-3">
+    <div
+      className={`rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-3 sm:p-4 shadow-2xs space-y-3 break-inside-avoid print:break-inside-avoid ${
+        filters.length === 0 ? "print:hidden" : "print:shadow-none print:border-slate-300 print:bg-white"
+      }`}
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+          <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 print:border print:border-indigo-200">
             <Filter className="w-3.5 h-3.5" />
           </div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 print:text-slate-900">
             Active Filters
           </span>
           {filters.length > 0 && (
@@ -153,7 +157,7 @@ export function GlobalFilterBar({
         </div>
 
         <div className="flex items-center gap-2.5">
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono print:text-slate-600">
             {filteredCount === totalCount ? (
               <span>All {totalCount.toLocaleString()} rows</span>
             ) : (
@@ -169,7 +173,7 @@ export function GlobalFilterBar({
             size="sm"
             variant="outline"
             onClick={handleOpenAddModal}
-            className="h-8 gap-1 text-xs"
+            className="h-8 gap-1 text-xs print:hidden"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Filter</span>
@@ -180,7 +184,7 @@ export function GlobalFilterBar({
               size="sm"
               variant="ghost"
               onClick={onClearFilters}
-              className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+              className="h-8 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 print:hidden"
             >
               <Trash2 className="w-3.5 h-3.5 mr-1" />
               Clear
@@ -191,11 +195,11 @@ export function GlobalFilterBar({
 
       {/* Filter Pills */}
       {filters.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/80 print:border-slate-200">
           {filters.map((f) => (
             <div
               key={f.id}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs print:bg-slate-50 print:border-slate-300 print:text-slate-800"
             >
               {f.type === "categorical" && <Layers className="w-3 h-3 text-indigo-500" />}
               {f.type === "date_range" && <Calendar className="w-3 h-3 text-emerald-500" />}
@@ -212,7 +216,7 @@ export function GlobalFilterBar({
 
               <button
                 onClick={() => onRemoveFilter(f.id)}
-                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 rounded"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 rounded print:hidden"
                 title="Remove filter"
               >
                 <X className="w-3 h-3" />

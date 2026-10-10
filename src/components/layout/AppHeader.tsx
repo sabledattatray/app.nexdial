@@ -66,7 +66,7 @@ export function AppHeader({ datasetName: propName, rowCount: propRows }: AppHead
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/90 px-4 sm:px-6 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/90 px-4 sm:px-6 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90 print:hidden">
       {/* Brand & Dataset Status */}
       <div className="flex items-center gap-4">
         <Link href="/app" className="flex items-center gap-2.5 font-bold text-slate-900 dark:text-slate-100">
