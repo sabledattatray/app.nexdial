@@ -6,68 +6,151 @@ import { ShieldCheck, Heart } from "lucide-react";
 export function Footer() {
   return (
     <footer className="w-full border-t border-slate-200 bg-white py-12 dark:border-slate-800 dark:bg-slate-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand Col */}
-          <div className="space-y-3 md:col-span-2">
+          <div className="space-y-3 lg:col-span-1">
             <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <span>{BRAND.name}</span>
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">
-                ₹0 Free & Open Source
-              </span>
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
+            <span className="inline-block text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">
+              ₹0 Free & Open Source
+            </span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               {BRAND.description}
             </p>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 pt-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>Zero-telemetry privacy promise: files stay on your machine.</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+              <span>Zero-telemetry: runs locally.</span>
             </div>
           </div>
 
           {/* Product Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100">
-              Product
+              Platform
             </h4>
-            <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+            <ul className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
               <li>
-                <Link href="/app" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Web Workspace
+                <Link href="/features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Features & Engine
                 </Link>
               </li>
               <li>
-                <Link href="/app/new" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Upload Spreadsheet
+                <Link href="/how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/app/templates" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                <Link href="/templates" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   MIS Templates
                 </Link>
               </li>
               <li>
-                <Link href="/excel-to-dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Excel to Dashboard
+                <Link href="/guides" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Educational Guides
+                </Link>
+              </li>
+              <li>
+                <Link href="/app" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Open Workspace
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Trust & Legal Links */}
+          {/* Use Cases */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+              Use Cases
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
+              <li>
+                <Link href="/excel-to-dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Excel to Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link href="/csv-dashboard-generator" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  CSV Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link href="/free-mis-report-generator" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  MIS Report Generator
+                </Link>
+              </li>
+              <li>
+                <Link href="/sales-dashboard-from-excel" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Sales Dashboards
+                </Link>
+              </li>
+              <li>
+                <Link href="/inventory-dashboard-template" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Inventory & Stock
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Specialized Dashboards */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100">
+              Departments
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
+              <li>
+                <Link href="/hr-mis-dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  HR MIS & Headcount
+                </Link>
+              </li>
+              <li>
+                <Link href="/finance-mis-dashboard" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Finance & OPEX
+                </Link>
+              </li>
+              <li>
+                <Link href="/guides/clean-excel-data" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Cleaning Dirty Data
+                </Link>
+              </li>
+              <li>
+                <Link href="/guides/prevent-spreadsheet-errors" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Spreadsheet Security
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Trust & Legal */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-100">
               Transparency
             </h4>
-            <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+            <ul className="space-y-2 text-xs text-slate-500 dark:text-slate-400">
               <li>
                 <Link href="/privacy" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                  Terms of Use
+                <Link href="/security" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Security Architecture
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  About OpenMIS
+                </Link>
+              </li>
+              <li>
+                <Link href="/changelog" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                  Changelog (v1.0.0)
                 </Link>
               </li>
               <li>

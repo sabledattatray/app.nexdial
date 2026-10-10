@@ -25,18 +25,21 @@ export function MarketingHeader() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
-          <Link href="/#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+          <Link href="/features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             Features
           </Link>
-          <Link href="/#how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+          <Link href="/how-it-works" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             How It Works
           </Link>
-          <Link href="/app/templates" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-            MIS Templates
+          <Link href="/templates" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            Templates
           </Link>
-          <Link href="/#privacy" className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+          <Link href="/guides" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+            Guides
+          </Link>
+          <Link href="/privacy" className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            Privacy First
+            Privacy
           </Link>
         </nav>
 
@@ -69,28 +72,35 @@ export function MarketingHeader() {
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-2 pb-6 space-y-3">
           <Link
-            href="/#features"
+            href="/features"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             Features
           </Link>
           <Link
-            href="/#how-it-works"
+            href="/how-it-works"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             How It Works
           </Link>
           <Link
-            href="/app/templates"
+            href="/templates"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
           >
             MIS Templates
           </Link>
           <Link
-            href="/#privacy"
+            href="/guides"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
+          >
+            Guides
+          </Link>
+          <Link
+            href="/privacy"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-200"
           >
