@@ -22,11 +22,17 @@ export const AggregationTypeSchema = z.enum([
 export const ChartTypeSchema = z.enum([
   "kpi",
   "bar",
+  "horizontal_bar",
   "line",
   "area",
   "donut",
+  "pie",
+  "waterfall",
+  "gauge",
+  "funnel",
   "scatter",
   "table",
+  "slicer",
 ]);
 
 export const GridSpanSchema = z.enum(["full", "half", "quarter"]);

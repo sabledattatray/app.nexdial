@@ -113,11 +113,18 @@ function WidgetInspectorForm({
             className="w-full text-xs"
           >
             <option value="kpi">Executive KPI Card</option>
-            <option value="bar">Bar / Column Chart</option>
-            <option value="line">Line Chart</option>
-            <option value="area">Area Chart</option>
+            <option value="bar">Vertical Bar / Column Chart</option>
+            <option value="horizontal_bar">Horizontal Bar / Leaderboard</option>
+            <option value="line">Line Trend Chart</option>
+            <option value="area">Area Trend Chart</option>
             <option value="donut">Donut Composition Chart</option>
+            <option value="pie">Classic Pie Chart</option>
+            <option value="waterfall">Waterfall Variance Bridge Chart</option>
+            <option value="gauge">Radial Metric Gauge (0-100%)</option>
+            <option value="funnel">Conversion Funnel Chart</option>
             <option value="scatter">Scatter Plot (Correlation)</option>
+            <option value="table">Executive Data Table Grid</option>
+            <option value="slicer">Interactive Dimension Slicer</option>
           </Select>
         </div>
 

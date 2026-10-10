@@ -8,11 +8,13 @@ import { Modal } from "@/components/ui/Modal";
 import { useECharts } from "./useECharts";
 import { ChartWidgetSpec } from "@/domain/recommendations/chart-recommender";
 import { RowData } from "@/domain/dataset/types";
+import { ReportFilter } from "@/domain/report/schema";
 import { TemplateColorTheme } from "@/lib/templates/template-registry";
 import {
   HelpCircle,
   Table as TableIcon,
   BarChart2,
+  BarChart3,
   TrendingUp,
   PieChart,
   Activity,
@@ -22,6 +24,14 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
+  Sliders,
+  Gauge,
+  Filter,
+  Table2,
+  ArrowUpDown,
+  Check,
+  Search,
+  X,
 } from "lucide-react";
 import * as echarts from "echarts";
 
@@ -156,10 +166,12 @@ export function formatChartValue(val: number): string {
   return val.toLocaleString(undefined, { maximumFractionDigits: 1 });
 }
 
-interface WidgetCardProps {
+export interface WidgetCardProps {
   spec: ChartWidgetSpec;
   rows: RowData[];
   colorTheme?: TemplateColorTheme;
+  activeFilters?: ReportFilter[];
+  onFilterSelect?: (fieldName: string, value: string) => void;
   onEdit?: (spec: ChartWidgetSpec) => void;
   onDuplicate?: (spec: ChartWidgetSpec) => void;
   onDelete?: (widgetId: string) => void;
@@ -171,6 +183,8 @@ export function WidgetCard({
   spec,
   rows,
   colorTheme = "indigo",
+  activeFilters,
+  onFilterSelect,
   onEdit,
   onDuplicate,
   onDelete,
@@ -182,6 +196,14 @@ export function WidgetCard({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [themeTrigger, setThemeTrigger] = useState(0);
 
+  // Slicer local search state
+  const [slicerSearch, setSlicerSearch] = useState("");
+
+  // Executive Table local search and sort state
+  const [tableSearch, setTableSearch] = useState("");
+  const [tableSortField, setTableSortField] = useState<"label" | "value" | "count">("value");
+  const [tableSortDir, setTableSortDir] = useState<"asc" | "desc">("desc");
+
   useEffect(() => {
     const handler = () => setThemeTrigger((v) => v + 1);
     window.addEventListener("openmis-theme-change", handler);
@@ -190,6 +212,7 @@ export function WidgetCard({
 
   // 1. Process Chart Data from Rows
   const processedData = useMemo(() => {
+    // KPI
     if (spec.type === "kpi") {
       let sum = 0;
       let count = 0;
@@ -206,7 +229,14 @@ export function WidgetCard({
       };
     }
 
-    if (spec.type === "bar" || spec.type === "donut") {
+    // Bar, Horizontal Bar, Donut, Pie, Funnel
+    if (
+      spec.type === "bar" ||
+      spec.type === "horizontal_bar" ||
+      spec.type === "donut" ||
+      spec.type === "pie" ||
+      spec.type === "funnel"
+    ) {
       const dim = spec.dimensionField || "";
       const meas = spec.measureField || "";
       const groupSums = new Map<string, number>();
@@ -220,19 +250,25 @@ export function WidgetCard({
       }
 
       let entries = Array.from(groupSums.entries()).sort((a, b) => b[1] - a[1]);
+      const totalSum = entries.reduce((acc, v) => acc + v[1], 0);
+
       if (spec.topN && entries.length > spec.topN) {
         const top = entries.slice(0, spec.topN);
         const otherSum = entries.slice(spec.topN).reduce((acc, v) => acc + v[1], 0);
-        top.push(["Other", otherSum]);
+        if (spec.type !== "funnel") {
+          top.push(["Other", otherSum]);
+        }
         entries = top;
       }
 
       return {
         categories: entries.map((e) => e[0]),
         values: entries.map((e) => Math.round(e[1] * 100) / 100),
+        totalSum,
       };
     }
 
+    // Line and Area (Time series)
     if (spec.type === "line" || spec.type === "area") {
       const dateDim = spec.dimensionField || "";
       const meas = spec.measureField || "";
@@ -246,7 +282,6 @@ export function WidgetCard({
         }
       }
 
-      // Sort dates chronologically
       const entries = Array.from(timeSums.entries()).sort((a, b) =>
         a[0].localeCompare(b[0])
       );
@@ -257,6 +292,108 @@ export function WidgetCard({
       };
     }
 
+    // Waterfall Bridge Chart
+    if (spec.type === "waterfall") {
+      const dim = spec.dimensionField || "";
+      const meas = spec.measureField || "";
+      const groupDeltas = new Map<string, number>();
+
+      for (const r of rows) {
+        const key = String(r[dim] ?? "General").trim();
+        const val = Number(r[meas] || 0);
+        if (!isNaN(val)) {
+          groupDeltas.set(key, (groupDeltas.get(key) || 0) + val);
+        }
+      }
+
+      let entries = Array.from(groupDeltas.entries());
+      if (spec.topN && entries.length > spec.topN) {
+        entries = entries.slice(0, spec.topN);
+      } else if (entries.length > 8) {
+        entries = entries.slice(0, 8);
+      }
+
+      const categories: string[] = [];
+      const baseData: number[] = [];
+      const increaseData: number[] = [];
+      const decreaseData: number[] = [];
+      const totalData: number[] = [];
+      const cumulativeBalances: number[] = [];
+
+      let runningBalance = 0;
+      for (const [cat, val] of entries) {
+        categories.push(cat);
+        const prevBalance = runningBalance;
+        runningBalance += val;
+        cumulativeBalances.push(Math.round(runningBalance * 100) / 100);
+
+        if (val >= 0) {
+          baseData.push(Math.round(prevBalance * 100) / 100);
+          increaseData.push(Math.round(val * 100) / 100);
+          decreaseData.push(0);
+          totalData.push(0);
+        } else {
+          baseData.push(Math.round(runningBalance * 100) / 100);
+          increaseData.push(0);
+          decreaseData.push(Math.round(Math.abs(val) * 100) / 100);
+          totalData.push(0);
+        }
+      }
+
+      // Net Total Anchor Bar
+      categories.push("Net Total");
+      baseData.push(0);
+      increaseData.push(0);
+      decreaseData.push(0);
+      totalData.push(Math.round(runningBalance * 100) / 100);
+      cumulativeBalances.push(Math.round(runningBalance * 100) / 100);
+
+      return {
+        waterfall: {
+          categories,
+          baseData,
+          increaseData,
+          decreaseData,
+          totalData,
+          cumulativeBalances,
+        },
+      };
+    }
+
+    // Radial Gauge
+    if (spec.type === "gauge") {
+      const meas = spec.measureField || "";
+      let sum = 0;
+      let count = 0;
+      let maxVal = 0;
+
+      for (const r of rows) {
+        const val = Number(r[meas] || 0);
+        if (!isNaN(val)) {
+          sum += val;
+          count++;
+          if (val > maxVal) maxVal = val;
+        }
+      }
+
+      const avg = count > 0 ? sum / count : 0;
+      let gaugeScore = Math.round(avg * 10) / 10;
+      if (gaugeScore > 100) {
+        const benchmark = maxVal > 0 ? maxVal : 100;
+        gaugeScore = Math.min(100, Math.round((avg / benchmark) * 100 * 10) / 10);
+      }
+
+      return {
+        gauge: {
+          score: Math.max(0, Math.min(100, gaugeScore)),
+          rawAverage: avg,
+          rawSum: sum,
+          count,
+        },
+      };
+    }
+
+    // Scatter Plot
     if (spec.type === "scatter") {
       const m1 = spec.measureField || "";
       const m2 = spec.secondaryMeasureField || "";
@@ -271,7 +408,66 @@ export function WidgetCard({
       }
 
       return {
-        scatterPoints: points.slice(0, 500), // Cap at 500 for snappy rendering
+        scatterPoints: points.slice(0, 500),
+      };
+    }
+
+    // Executive Data Table Grid
+    if (spec.type === "table") {
+      const dim = spec.dimensionField || "";
+      const meas = spec.measureField || "";
+      const groupMap = new Map<string, { sum: number; count: number }>();
+
+      for (const r of rows) {
+        const key = String(r[dim] ?? "Unassigned").trim();
+        const val = Number(r[meas] || 0);
+        const cur = groupMap.get(key) || { sum: 0, count: 0 };
+        if (!isNaN(val)) {
+          cur.sum += val;
+        }
+        cur.count += 1;
+        groupMap.set(key, cur);
+      }
+
+      const items = Array.from(groupMap.entries()).map(([label, stats]) => ({
+        label,
+        sum: Math.round(stats.sum * 100) / 100,
+        count: stats.count,
+        average: stats.count > 0 ? Math.round((stats.sum / stats.count) * 100) / 100 : 0,
+      }));
+
+      const grandTotal = items.reduce((acc, i) => acc + i.sum, 0);
+      const maxVal = Math.max(...items.map((i) => i.sum), 1);
+
+      return {
+        tableData: {
+          items,
+          grandTotal,
+          maxVal,
+          totalRecords: rows.length,
+        },
+      };
+    }
+
+    // Interactive Slicer
+    if (spec.type === "slicer") {
+      const dim = spec.dimensionField || "";
+      const counts = new Map<string, number>();
+
+      for (const r of rows) {
+        const key = String(r[dim] ?? "Unassigned").trim();
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+
+      const items = Array.from(counts.entries())
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count);
+
+      return {
+        slicerData: {
+          items,
+          totalRows: rows.length,
+        },
       };
     }
 
@@ -285,6 +481,7 @@ export function WidgetCard({
     const gridLineColor = isDark ? "#1e293b" : "#f1f5f9";
     const palette = THEME_PALETTES[colorTheme] || THEME_PALETTES.indigo;
 
+    // Vertical Bar
     if (spec.type === "bar") {
       const data = processedData as { categories: string[]; values: number[] } | null;
       return {
@@ -364,6 +561,86 @@ export function WidgetCard({
       };
     }
 
+    // Horizontal Bar / Leaderboard
+    if (spec.type === "horizontal_bar") {
+      const data = processedData as { categories: string[]; values: number[] } | null;
+      return {
+        backgroundColor: "transparent",
+        tooltip: {
+          trigger: "axis",
+          axisPointer: { type: "shadow" },
+          formatter: (params: unknown) => {
+            const p = (Array.isArray(params) ? params[0] : params) as { name?: string; value?: number };
+            if (!p) return "";
+            return `<div style="font-family:inherit;font-size:12px;padding:2px 4px;">
+              <div style="font-weight:600;margin-bottom:4px;color:${isDark ? "#e2e8f0" : "#1e293b"};">${p.name || ""}</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${palette.primary};"></span>
+                <span style="font-weight:700;color:${isDark ? "#f8fafc" : "#0f172a"};">${Number(p.value || 0).toLocaleString()}</span>
+              </div>
+            </div>`;
+          },
+        },
+        grid: { top: 20, right: 65, bottom: 25, left: 95, containLabel: true },
+        xAxis: {
+          type: "value",
+          splitLine: { lineStyle: { color: gridLineColor, type: "dashed" } },
+          axisLabel: {
+            color: textColor,
+            fontSize: 11,
+            formatter: (v: number) => formatChartValue(v),
+          },
+        },
+        yAxis: {
+          type: "category",
+          inverse: true,
+          data: data?.categories || [],
+          axisLabel: {
+            color: textColor,
+            fontSize: 11,
+            overflow: "truncate",
+            width: 90,
+          },
+          axisLine: { lineStyle: { color: isDark ? "#334155" : "#e2e8f0" } },
+          axisTick: { show: false },
+        },
+        series: [
+          {
+            data: data?.values || [],
+            type: "bar",
+            barMaxWidth: 26,
+            itemStyle: {
+              borderRadius: [0, 6, 6, 0],
+              color: {
+                type: "linear",
+                x: 0,
+                y: 0,
+                x2: 1,
+                y2: 0,
+                colorStops: [
+                  { offset: 0, color: palette.primary },
+                  { offset: 1, color: palette.accent },
+                ],
+              },
+            },
+            label: {
+              show: true,
+              position: "right",
+              distance: 8,
+              formatter: (params: unknown) => {
+                const p = params as { value?: number };
+                return formatChartValue(Number(p.value || 0));
+              },
+              fontSize: 11,
+              fontWeight: 700,
+              color: isDark ? "#f1f5f9" : "#1e293b",
+            },
+          },
+        ],
+      };
+    }
+
+    // Line and Area
     if (spec.type === "line" || spec.type === "area") {
       const data = processedData as { categories: string[]; values: number[] } | null;
       const isArea = spec.type === "area";
@@ -449,8 +726,10 @@ export function WidgetCard({
       };
     }
 
-    if (spec.type === "donut") {
+    // Donut and Solid Pie Charts
+    if (spec.type === "donut" || spec.type === "pie") {
       const data = processedData as { categories: string[]; values: number[] } | null;
+      const isDonut = spec.type === "donut";
       const pieData = (data?.categories || []).map((cat, idx) => ({
         name: cat,
         value: data?.values[idx] || 0,
@@ -473,17 +752,17 @@ export function WidgetCard({
           },
         },
         legend: {
-          show: false, // Hidden to prevent collision with bottom slice callout labels
+          show: false,
         },
         series: [
           {
             type: "pie",
-            radius: ["36%", "58%"],
+            radius: isDonut ? ["36%", "58%"] : ["0%", "58%"],
             center: ["50%", "50%"],
             avoidLabelOverlap: true,
             minAngle: 12,
             itemStyle: {
-              borderRadius: 6,
+              borderRadius: isDonut ? 6 : 4,
               borderColor: isDark ? "#0f172a" : "#ffffff",
               borderWidth: 2,
             },
@@ -521,6 +800,286 @@ export function WidgetCard({
       };
     }
 
+    // Waterfall Chart
+    if (spec.type === "waterfall") {
+      const data = (processedData as {
+        waterfall?: {
+          categories: string[];
+          baseData: number[];
+          increaseData: number[];
+          decreaseData: number[];
+          totalData: number[];
+          cumulativeBalances: number[];
+        };
+      } | null)?.waterfall;
+
+      return {
+        backgroundColor: "transparent",
+        tooltip: {
+          trigger: "axis",
+          axisPointer: { type: "shadow" },
+          formatter: (params: unknown) => {
+            const arr = (Array.isArray(params) ? params : [params]) as Array<{
+              name?: string;
+              dataIndex?: number;
+            }>;
+            if (!arr || arr.length === 0) return "";
+            const idx = arr[0]?.dataIndex ?? 0;
+            const name = arr[0]?.name ?? "";
+            const inc = data?.increaseData[idx] ?? 0;
+            const dec = data?.decreaseData[idx] ?? 0;
+            const tot = data?.totalData[idx] ?? 0;
+            const bal = data?.cumulativeBalances[idx] ?? 0;
+
+            let impactText = "";
+            if (name === "Net Total") {
+              impactText = `<span style="color:${palette.primary};font-weight:700;">Net Balance: ${tot.toLocaleString()}</span>`;
+            } else if (inc > 0) {
+              impactText = `<span style="color:#10b981;font-weight:700;">+${inc.toLocaleString()} (Addition)</span>`;
+            } else if (dec > 0) {
+              impactText = `<span style="color:#f43f5e;font-weight:700;">-${dec.toLocaleString()} (Reduction)</span>`;
+            } else {
+              impactText = `<span>0</span>`;
+            }
+
+            return `<div style="font-family:inherit;font-size:12px;padding:2px 4px;">
+              <div style="font-weight:600;margin-bottom:4px;color:${isDark ? "#e2e8f0" : "#1e293b"};">${name}</div>
+              <div style="margin-bottom:2px;">${impactText}</div>
+              <div style="font-size:11px;color:${textColor};">Balance: <strong>${bal.toLocaleString()}</strong></div>
+            </div>`;
+          },
+        },
+        grid: { top: 35, right: 20, bottom: 45, left: 60, containLabel: true },
+        xAxis: {
+          type: "category",
+          data: data?.categories || [],
+          axisLabel: {
+            color: textColor,
+            fontSize: 11,
+            rotate: (data?.categories?.length || 0) > 5 ? 25 : 0,
+          },
+          axisLine: { lineStyle: { color: isDark ? "#334155" : "#e2e8f0" } },
+          axisTick: { show: false },
+        },
+        yAxis: {
+          type: "value",
+          splitLine: { lineStyle: { color: gridLineColor, type: "dashed" } },
+          axisLabel: {
+            color: textColor,
+            fontSize: 11,
+            formatter: (v: number) => formatChartValue(v),
+          },
+        },
+        series: [
+          {
+            name: "Base",
+            type: "bar",
+            stack: "waterfall",
+            itemStyle: { borderColor: "transparent", color: "transparent" },
+            emphasis: { itemStyle: { borderColor: "transparent", color: "transparent" } },
+            data: data?.baseData || [],
+          },
+          {
+            name: "Increase",
+            type: "bar",
+            stack: "waterfall",
+            data: data?.increaseData || [],
+            itemStyle: { color: "#10b981", borderRadius: [4, 4, 0, 0] },
+            label: {
+              show: true,
+              position: "top",
+              formatter: (p: unknown) => {
+                const v = Number((p as { value?: number }).value || 0);
+                return v > 0 ? `+${formatChartValue(v)}` : "";
+              },
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#10b981",
+            },
+          },
+          {
+            name: "Decrease",
+            type: "bar",
+            stack: "waterfall",
+            data: data?.decreaseData || [],
+            itemStyle: { color: "#f43f5e", borderRadius: [0, 0, 4, 4] },
+            label: {
+              show: true,
+              position: "bottom",
+              formatter: (p: unknown) => {
+                const v = Number((p as { value?: number }).value || 0);
+                return v > 0 ? `-${formatChartValue(v)}` : "";
+              },
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#f43f5e",
+            },
+          },
+          {
+            name: "Total",
+            type: "bar",
+            stack: "waterfall",
+            data: data?.totalData || [],
+            itemStyle: { color: palette.primary, borderRadius: [4, 4, 0, 0] },
+            label: {
+              show: true,
+              position: "top",
+              formatter: (p: unknown) => {
+                const v = Number((p as { value?: number }).value || 0);
+                return v !== 0 ? formatChartValue(v) : "";
+              },
+              fontSize: 11,
+              fontWeight: 700,
+              color: palette.primary,
+            },
+          },
+        ],
+      };
+    }
+
+    // Radial Attainment Gauge
+    if (spec.type === "gauge") {
+      const score = (processedData as { gauge?: { score: number; rawAverage: number } } | null)?.gauge?.score || 0;
+      return {
+        backgroundColor: "transparent",
+        series: [
+          {
+            type: "gauge",
+            startAngle: 210,
+            endAngle: -30,
+            min: 0,
+            max: 100,
+            splitNumber: 5,
+            radius: "84%",
+            center: ["50%", "56%"],
+            itemStyle: {
+              color: palette.primary,
+            },
+            progress: {
+              show: true,
+              roundCap: true,
+              width: 14,
+            },
+            pointer: {
+              length: "55%",
+              width: 5,
+              offsetCenter: [0, "5%"],
+              itemStyle: {
+                color: palette.primary,
+              },
+            },
+            axisLine: {
+              roundCap: true,
+              lineStyle: {
+                width: 14,
+                color: [[1, isDark ? "#1e293b" : "#f1f5f9"]],
+              },
+            },
+            axisTick: {
+              distance: -20,
+              splitNumber: 4,
+              lineStyle: {
+                width: 1,
+                color: isDark ? "#475569" : "#cbd5e1",
+              },
+            },
+            splitLine: {
+              distance: -24,
+              length: 10,
+              lineStyle: {
+                width: 2,
+                color: isDark ? "#64748b" : "#94a3b8",
+              },
+            },
+            axisLabel: {
+              distance: -16,
+              color: textColor,
+              fontSize: 10,
+            },
+            title: {
+              show: true,
+              offsetCenter: [0, "45%"],
+              fontSize: 12,
+              fontWeight: 600,
+              color: textColor,
+            },
+            detail: {
+              valueAnimation: true,
+              fontSize: 26,
+              fontWeight: 800,
+              offsetCenter: [0, "18%"],
+              formatter: "{value}%",
+              color: isDark ? "#f8fafc" : "#0f172a",
+            },
+            data: [
+              {
+                value: score,
+                name: "Attainment",
+              },
+            ],
+          },
+        ],
+      };
+    }
+
+    // Conversion Funnel
+    if (spec.type === "funnel") {
+      const data = processedData as { categories: string[]; values: number[] } | null;
+      const funnelData = (data?.categories || []).map((cat, idx) => ({
+        name: cat,
+        value: data?.values[idx] || 0,
+      }));
+
+      return {
+        backgroundColor: "transparent",
+        color: palette.donutPalette,
+        tooltip: {
+          trigger: "item",
+          formatter: (params: unknown) => {
+            const p = params as { name?: string; value?: number; percent?: number };
+            return `<div style="font-family:inherit;font-size:12px;padding:2px 4px;">
+              <div style="font-weight:600;margin-bottom:4px;color:${isDark ? "#e2e8f0" : "#1e293b"};">${p.name || ""}</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-weight:700;color:${isDark ? "#f8fafc" : "#0f172a"};">${Number(p.value || 0).toLocaleString()} (${p.percent || 0}%)</span>
+              </div>
+            </div>`;
+          },
+        },
+        series: [
+          {
+            name: spec.title,
+            type: "funnel",
+            left: "12%",
+            top: 25,
+            bottom: 25,
+            width: "76%",
+            minSize: "18%",
+            maxSize: "100%",
+            sort: "descending",
+            gap: 4,
+            label: {
+              show: true,
+              position: "inside",
+              formatter: (params: unknown) => {
+                const p = params as { name?: string; value?: number };
+                return `${p.name}: ${formatChartValue(Number(p.value || 0))}`;
+              },
+              fontSize: 11,
+              fontWeight: 700,
+              color: "#ffffff",
+            },
+            itemStyle: {
+              borderColor: isDark ? "#0f172a" : "#ffffff",
+              borderWidth: 2,
+              borderRadius: 4,
+            },
+            data: funnelData,
+          },
+        ],
+      };
+    }
+
+    // Scatter
     if (spec.type === "scatter") {
       const data = processedData as { scatterPoints: [number, number][] } | null;
       return {
@@ -579,24 +1138,38 @@ export function WidgetCard({
     switch (spec.type) {
       case "bar":
         return <BarChart2 className="w-4 h-4" style={iconStyle} />;
+      case "horizontal_bar":
+        return <BarChart3 className="w-4 h-4 rotate-90" style={iconStyle} />;
       case "line":
       case "area":
         return <TrendingUp className="w-4 h-4" style={iconStyle} />;
       case "donut":
+      case "pie":
         return <PieChart className="w-4 h-4" style={iconStyle} />;
+      case "waterfall":
+        return <BarChart3 className="w-4 h-4" style={iconStyle} />;
+      case "gauge":
+        return <Gauge className="w-4 h-4" style={iconStyle} />;
+      case "funnel":
+        return <Filter className="w-4 h-4" style={iconStyle} />;
       case "scatter":
         return <Activity className="w-4 h-4" style={iconStyle} />;
+      case "table":
+        return <Table2 className="w-4 h-4" style={iconStyle} />;
+      case "slicer":
+        return <Sliders className="w-4 h-4" style={iconStyle} />;
       default:
         return <Layers className="w-4 h-4 text-slate-500" />;
     }
   };
 
-  // If KPI Widget
+  // =========================================================================
+  // VIEW 1: KPI Widget Card
+  // =========================================================================
   if (spec.type === "kpi") {
     const kpi = processedData as { kpiValue: number; count: number } | null;
     return (
       <Card className={`p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white relative overflow-hidden ${palette.kpiBorder} border`}>
-        {/* Top color accent strip matching template theme */}
         <div
           className="absolute top-0 left-0 right-0 h-1"
           style={{ background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})` }}
@@ -662,7 +1235,6 @@ export function WidgetCard({
           <span>{rows.length.toLocaleString()} rows</span>
         </div>
 
-        {/* Modal for calculation formula */}
         <Modal
           isOpen={whyModalOpen}
           onClose={() => setWhyModalOpen(false)}
@@ -678,7 +1250,6 @@ export function WidgetCard({
           </div>
         </Modal>
 
-        {/* Delete Confirmation Modal */}
         <Modal
           isOpen={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
@@ -711,12 +1282,466 @@ export function WidgetCard({
     );
   }
 
-  // Regular Chart Widget (Bar, Line, Donut, Scatter)
+  // =========================================================================
+  // VIEW 2: Interactive Dimension Slicer Visual
+  // =========================================================================
+  if (spec.type === "slicer") {
+    const rawSlicer = (processedData as { slicerData?: { items: { label: string; count: number }[]; totalRows: number } } | null)?.slicerData;
+    const allItems = rawSlicer?.items || [];
+    const activeValues = (activeFilters?.find((f) => f.fieldName === spec.dimensionField)?.values || []).map(String);
+
+    const filteredItems = allItems.filter((i) =>
+      i.label.toLowerCase().includes(slicerSearch.toLowerCase())
+    );
+
+    return (
+      <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white border border-slate-200 dark:border-slate-800">
+        <div
+          className="h-1 w-full shrink-0"
+          style={{ background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})` }}
+        />
+        <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-row items-center justify-between space-y-0 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 print:border print:border-slate-200">
+              <Sliders className="w-4 h-4" style={{ color: palette.primary }} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold print:text-slate-900">{spec.title}</CardTitle>
+                <Badge variant="outline" className="text-[10px]">
+                  {spec.dimensionField}
+                </Badge>
+              </div>
+              <CardDescription className="text-[11px]">Click items to filter all charts</CardDescription>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 print:hidden">
+            {activeValues.length > 0 && onFilterSelect && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onFilterSelect(spec.dimensionField || "", "__ALL__")}
+                className="h-6 text-[10px] px-2 text-rose-500 hover:text-rose-600 gap-1"
+                title="Clear filter on this slicer"
+              >
+                <X className="w-3 h-3" />
+                <span>Reset</span>
+              </Button>
+            )}
+
+            {onMoveUp && (
+              <button
+                onClick={() => onMoveUp(spec.id)}
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                title="Move Earlier"
+              >
+                <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onMoveDown && (
+              <button
+                onClick={() => onMoveDown(spec.id)}
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                title="Move Later"
+              >
+                <ArrowDown className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onEdit && (
+              <button
+                onClick={() => onEdit(spec)}
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                title="Edit Slicer"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onDuplicate && (
+              <button
+                onClick={() => onDuplicate(spec)}
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                title="Duplicate Slicer"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onDelete && (
+              <button
+                onClick={() => setDeleteModalOpen(true)}
+                className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                title="Delete Slicer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-4 flex-1 flex flex-col justify-start min-h-[300px] space-y-3">
+          {allItems.length > 5 && (
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={slicerSearch}
+                onChange={(e) => setSlicerSearch(e.target.value)}
+                placeholder={`Search ${spec.dimensionField}...`}
+                className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 max-h-[220px] overflow-y-auto pr-1">
+            {/* All / Clear Pill */}
+            <button
+              onClick={() => onFilterSelect?.(spec.dimensionField || "", "__ALL__")}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs border ${
+                activeValues.length === 0
+                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent shadow-xs"
+                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+              }`}
+            >
+              <span>All Values</span>
+              <span className="text-[10px] opacity-75 font-mono">({rawSlicer?.totalRows || 0})</span>
+            </button>
+
+            {filteredItems.map((item) => {
+              const isSelected = activeValues.includes(item.label);
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => onFilterSelect?.(spec.dimensionField || "", item.label)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all shadow-2xs border ${
+                    isSelected
+                      ? "ring-2 ring-offset-1 text-white shadow-xs font-bold"
+                      : "bg-white dark:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+                  }`}
+                  style={
+                    isSelected
+                      ? {
+                          backgroundColor: palette.primary,
+                          borderColor: palette.primary,
+                        }
+                      : undefined
+                  }
+                >
+                  {isSelected && <Check className="w-3.5 h-3.5 shrink-0 stroke-[3]" />}
+                  <span className="truncate max-w-[140px]">{item.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                      isSelected
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                    }`}
+                  >
+                    {item.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+            <span>
+              {activeValues.length > 0 ? `${activeValues.length} active filter(s)` : "Unfiltered"}
+            </span>
+            <span>{allItems.length} distinct segments</span>
+          </div>
+        </CardContent>
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Delete Slicer"
+          description="Are you sure you want to remove this slicer?"
+          maxWidth="sm"
+        >
+          <div className="space-y-4 text-xs">
+            <p className="text-slate-600 dark:text-slate-300">
+              Removing &ldquo;{spec.title}&rdquo; will remove this interactive slicer from the view.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  onDelete?.(spec.id);
+                }}
+              >
+                Delete Slicer
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </Card>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 3: Executive Data Table Grid Visual
+  // =========================================================================
+  if (spec.type === "table") {
+    const rawTable = (processedData as {
+      tableData?: {
+        items: { label: string; sum: number; count: number; average: number }[];
+        grandTotal: number;
+        maxVal: number;
+        totalRecords: number;
+      };
+    } | null)?.tableData;
+
+    const allItems = rawTable?.items || [];
+    const maxVal = rawTable?.maxVal || 1;
+    const grandTotal = rawTable?.grandTotal || 0;
+
+    const filteredItems = allItems.filter((i) =>
+      i.label.toLowerCase().includes(tableSearch.toLowerCase())
+    );
+
+    const sortedItems = [...filteredItems].sort((a, b) => {
+      let diff = 0;
+      if (tableSortField === "label") diff = a.label.localeCompare(b.label);
+      else if (tableSortField === "count") diff = a.count - b.count;
+      else diff = a.sum - b.sum;
+      return tableSortDir === "asc" ? diff : -diff;
+    });
+
+    const toggleSort = (field: "label" | "value" | "count") => {
+      if (tableSortField === field) {
+        setTableSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      } else {
+        setTableSortField(field);
+        setTableSortDir("desc");
+      }
+    };
+
+    return (
+      <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white border border-slate-200 dark:border-slate-800">
+        <div
+          className="h-1 w-full shrink-0"
+          style={{ background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})` }}
+        />
+        <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-row items-center justify-between space-y-0 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 print:border print:border-slate-200">
+              <Table2 className="w-4 h-4" style={{ color: palette.primary }} />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold print:text-slate-900">{spec.title}</CardTitle>
+              <CardDescription className="text-[11px]">
+                {spec.dimensionField || "Segment"} • {spec.measureField || "Measure"}
+              </CardDescription>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 print:hidden">
+            {allItems.length > 5 && (
+              <div className="relative mr-1">
+                <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={tableSearch}
+                  onChange={(e) => setTableSearch(e.target.value)}
+                  placeholder="Filter table..."
+                  className="w-28 text-[11px] pl-6 pr-2 py-1 rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none"
+                />
+              </div>
+            )}
+
+            {onMoveUp && (
+              <button
+                onClick={() => onMoveUp(spec.id)}
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                title="Move Earlier"
+              >
+                <ArrowUp className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onMoveDown && (
+              <button
+                onClick={() => onMoveDown(spec.id)}
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                title="Move Later"
+              >
+                <ArrowDown className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onEdit && (
+              <button
+                onClick={() => onEdit(spec)}
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                title="Edit Table"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onDuplicate && (
+              <button
+                onClick={() => onDuplicate(spec)}
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                title="Duplicate Table"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onDelete && (
+              <button
+                onClick={() => setDeleteModalOpen(true)}
+                className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                title="Delete Table"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0 flex-1 flex flex-col justify-start min-h-[300px]">
+          <div className="overflow-x-auto max-h-[290px] overflow-y-auto text-xs font-mono">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 uppercase text-[10px] tracking-wider z-10">
+                <tr>
+                  <th className="p-2.5 w-10 text-center">#</th>
+                  <th
+                    className="p-2.5 cursor-pointer hover:text-indigo-600"
+                    onClick={() => toggleSort("label")}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>{spec.dimensionField || "Segment"}</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th
+                    className="p-2.5 cursor-pointer hover:text-indigo-600 text-right w-20"
+                    onClick={() => toggleSort("count")}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Rows</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th className="p-2.5 w-32 hidden sm:table-cell">Distribution</th>
+                  <th
+                    className="p-2.5 cursor-pointer hover:text-indigo-600 text-right w-28"
+                    onClick={() => toggleSort("value")}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>{spec.measureField || "Sum"}</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th className="p-2.5 text-right w-16">Share</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {sortedItems.map((item, idx) => {
+                  const pct = grandTotal > 0 ? Math.round((item.sum / grandTotal) * 1000) / 10 : 0;
+                  const barWidth = Math.min(100, Math.max(4, Math.round((item.sum / maxVal) * 100)));
+                  return (
+                    <tr
+                      key={item.label}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+                    >
+                      <td className="p-2.5 text-center text-slate-400 font-mono text-[11px]">{idx + 1}</td>
+                      <td className="p-2.5 font-sans font-semibold text-slate-800 dark:text-slate-200">
+                        {item.label}
+                      </td>
+                      <td className="p-2.5 text-right text-slate-500 dark:text-slate-400">
+                        {item.count.toLocaleString()}
+                      </td>
+                      <td className="p-2.5 hidden sm:table-cell">
+                        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                              width: `${barWidth}%`,
+                              background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})`,
+                            }}
+                          />
+                        </div>
+                      </td>
+                      <td className="p-2.5 text-right font-bold text-slate-900 dark:text-slate-100 font-mono">
+                        {item.sum.toLocaleString()}
+                      </td>
+                      <td className="p-2.5 text-right text-slate-500 font-mono text-[11px]">
+                        {pct}%
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot className="sticky bottom-0 bg-slate-50 dark:bg-slate-900 border-t-2 border-slate-200 dark:border-slate-800 font-bold text-[11px]">
+                <tr>
+                  <td className="p-2.5 text-center text-slate-400">Total</td>
+                  <td className="p-2.5 text-slate-900 dark:text-slate-100">
+                    {allItems.length} segments
+                  </td>
+                  <td className="p-2.5 text-right text-slate-700 dark:text-slate-300">
+                    {rawTable?.totalRecords.toLocaleString()}
+                  </td>
+                  <td className="p-2.5 hidden sm:table-cell">100% total</td>
+                  <td className="p-2.5 text-right text-slate-900 dark:text-slate-100 font-mono">
+                    {grandTotal.toLocaleString()}
+                  </td>
+                  <td className="p-2.5 text-right">100%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </CardContent>
+
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Delete Table Grid"
+          description="Are you sure you want to remove this table from your dashboard?"
+          maxWidth="sm"
+        >
+          <div className="space-y-4 text-xs">
+            <p className="text-slate-600 dark:text-slate-300">
+              Removing &ldquo;{spec.title}&rdquo; will remove this executive table grid.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  onDelete?.(spec.id);
+                }}
+              >
+                Delete Table
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </Card>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 4: ECharts Visualizations (Bar, Horizontal Bar, Line, Area, Donut, Pie, Waterfall, Gauge, Funnel, Scatter)
+  // =========================================================================
   const chartData = processedData as { categories?: string[]; values?: number[]; scatterPoints?: [number, number][] } | null;
 
   return (
-    <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white">
-      {/* Top subtle theme accent strip */}
+    <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white border border-slate-200 dark:border-slate-800">
       <div
         className="h-1 w-full shrink-0"
         style={{ background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})` }}
@@ -734,7 +1759,6 @@ export function WidgetCard({
           </div>
         </div>
 
-        {/* Controls: Why this chart + Data Table toggle + Inspector actions */}
         <div className="flex items-center gap-1 print:hidden">
           {spec.topN && (
             <Badge variant="outline" className="text-[10px] hidden sm:inline-flex mr-1">
@@ -814,7 +1838,6 @@ export function WidgetCard({
 
       <CardContent className="p-4 flex-1 flex flex-col justify-center min-h-[300px]">
         {showTable ? (
-          /* Accessible Data Table Fallback (PRD Section 7.5) */
           <div className="overflow-x-auto max-h-[280px] overflow-y-auto text-xs font-mono">
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 uppercase text-[10px]">
@@ -836,12 +1859,10 @@ export function WidgetCard({
             </table>
           </div>
         ) : (
-          /* ECharts Canvas Visual */
           <div ref={containerRef} className="w-full h-[300px]" />
         )}
       </CardContent>
 
-      {/* "Why this chart?" Modal */}
       <Modal
         isOpen={whyModalOpen}
         onClose={() => setWhyModalOpen(false)}
@@ -866,7 +1887,6 @@ export function WidgetCard({
         </div>
       </Modal>
 
-      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

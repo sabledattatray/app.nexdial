@@ -11,11 +11,17 @@ import { AggregationType } from "../metrics/aggregations";
 export type ChartType =
   | "kpi"
   | "bar"
+  | "horizontal_bar"
   | "line"
   | "area"
   | "donut"
+  | "pie"
+  | "waterfall"
+  | "gauge"
+  | "funnel"
   | "scatter"
-  | "table";
+  | "table"
+  | "slicer";
 
 export interface ChartWidgetSpec {
   id: string;
@@ -140,6 +146,38 @@ export function recommendDashboardWidgets(
       aggregation: "sum",
       whyThisChart: `Scatter plot maps two continuous numeric measures ("${m1.name}" vs "${m2.name}") to evaluate statistical correlation.`,
       gridSpan: "half",
+    });
+  }
+
+  // 6. Interactive Dimension Slicer (Instant Drill-Down Filter)
+  if (categoricalFields.length > 0) {
+    const slicerDim =
+      categoricalFields.find((f) => f.distinctCount >= 2 && f.distinctCount <= 12) ||
+      categoricalFields[0];
+    widgets.push({
+      id: `widget_slicer_${slicerDim.id}`,
+      type: "slicer",
+      title: `Filter by ${slicerDim.name}`,
+      dimensionField: slicerDim.name,
+      aggregation: "count",
+      whyThisChart: `Interactive slicer allows one-click filtering of all dashboard charts across "${slicerDim.name}" segments.`,
+      gridSpan: "half",
+    });
+  }
+
+  // 7. Executive Summary Data Grid (In-cell volume data bars)
+  if (categoricalFields.length > 0 && measureFields.length > 0) {
+    const tableDim = categoricalFields[0];
+    const tableMeas = measureFields[0];
+    widgets.push({
+      id: `widget_table_${tableDim.id}_${tableMeas.id}`,
+      type: "table",
+      title: `${tableDim.name} Executive Summary Grid`,
+      dimensionField: tableDim.name,
+      measureField: tableMeas.name,
+      aggregation: "sum",
+      whyThisChart: `Executive data table grid aggregates "${tableMeas.name}" across "${tableDim.name}" with in-cell volume bars and totals.`,
+      gridSpan: "full",
     });
   }
 

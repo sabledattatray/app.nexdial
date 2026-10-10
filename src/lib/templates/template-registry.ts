@@ -1,6 +1,20 @@
 export interface MISTemplateWidget {
   id: string;
-  type: "kpi" | "bar" | "column" | "line" | "area" | "donut" | "scatter" | "table";
+  type:
+    | "kpi"
+    | "bar"
+    | "horizontal_bar"
+    | "column"
+    | "line"
+    | "area"
+    | "donut"
+    | "pie"
+    | "waterfall"
+    | "gauge"
+    | "funnel"
+    | "scatter"
+    | "table"
+    | "slicer";
   title: string;
   gridSpan?: "half" | "full";
   measureField?: string;
@@ -59,9 +73,12 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "eb2", type: "kpi", title: "Operating Expenses", measureField: "Operating_Expenses", aggregation: "sum" },
       { id: "eb3", type: "kpi", title: "Net Income", measureField: "Net_Income", aggregation: "sum" },
       { id: "eb4", type: "kpi", title: "Total Headcount", measureField: "Headcount", aggregation: "sum" },
+      { id: "eb_slicer", type: "slicer", title: "Filter by Department", dimensionField: "Department", gridSpan: "half" },
+      { id: "eb_waterfall", type: "waterfall", title: "Department Net Income Bridge", dimensionField: "Department", measureField: "Net_Income", gridSpan: "half" },
       { id: "eb5", type: "line", title: "Net Income by Period", dimensionField: "Period", measureField: "Net_Income", gridSpan: "full" },
       { id: "eb6", type: "bar", title: "Expenses by Department", dimensionField: "Department", measureField: "Operating_Expenses" },
       { id: "eb7", type: "donut", title: "Revenue Share by Dept", dimensionField: "Department", measureField: "Gross_Revenue" },
+      { id: "eb_table", type: "table", title: "Department Financials Data Grid", dimensionField: "Department", measureField: "Gross_Revenue", gridSpan: "full" },
     ],
   },
   {
@@ -79,9 +96,12 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "s1", type: "kpi", title: "Total Sales Revenue", measureField: "Revenue", aggregation: "sum" },
       { id: "s2", type: "kpi", title: "Units Sold", measureField: "Units_Sold", aggregation: "sum" },
       { id: "s3", type: "kpi", title: "Deal Volume Count", measureField: "Revenue", aggregation: "count" },
+      { id: "s_slicer", type: "slicer", title: "Filter by Region", dimensionField: "Region", gridSpan: "half" },
+      { id: "s_leaderboard", type: "horizontal_bar", title: "Sales Rep Leaderboard", dimensionField: "Sales_Rep", measureField: "Revenue", gridSpan: "half" },
       { id: "s4", type: "line", title: "Daily Sales Revenue Trend", dimensionField: "Date", measureField: "Revenue", gridSpan: "full" },
-      { id: "s5", type: "bar", title: "Revenue by Region", dimensionField: "Region", measureField: "Revenue" },
+      { id: "s5", type: "pie", title: "Regional Revenue Share", dimensionField: "Region", measureField: "Revenue" },
       { id: "s6", type: "donut", title: "Product Category Split", dimensionField: "Category", measureField: "Revenue" },
+      { id: "s_table", type: "table", title: "Sales Rep Performance Grid", dimensionField: "Sales_Rep", measureField: "Revenue", gridSpan: "full" },
     ],
   },
   {
@@ -98,9 +118,11 @@ export const MIS_TEMPLATES: MISTemplate[] = [
     widgets: [
       { id: "f1", type: "kpi", title: "Total Actual Spend", measureField: "Actual_Spend", aggregation: "sum" },
       { id: "f2", type: "kpi", title: "Budget Allocated", measureField: "Budget_Allocated", aggregation: "sum" },
-      { id: "f3", type: "bar", title: "Spend by Department", dimensionField: "Department", measureField: "Actual_Spend" },
+      { id: "f_waterfall", type: "waterfall", title: "Department Spend Variance Walk", dimensionField: "Department", measureField: "Actual_Spend", gridSpan: "full" },
+      { id: "f3", type: "horizontal_bar", title: "Spend by Department", dimensionField: "Department", measureField: "Actual_Spend" },
       { id: "f4", type: "line", title: "Monthly Expense Trend", dimensionField: "Date", measureField: "Actual_Spend" },
       { id: "f5", type: "donut", title: "Expense Category Split", dimensionField: "Category", measureField: "Actual_Spend" },
+      { id: "f_table", type: "table", title: "Department Budget Summary Grid", dimensionField: "Department", measureField: "Actual_Spend", gridSpan: "full" },
     ],
   },
   {
@@ -119,9 +141,12 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "sm2", type: "kpi", title: "Expansion MRR", measureField: "Expansion_MRR", aggregation: "sum" },
       { id: "sm3", type: "kpi", title: "Churn MRR", measureField: "Churn_MRR", aggregation: "sum" },
       { id: "sm4", type: "kpi", title: "Active Subscribers", measureField: "Active_Subscribers", aggregation: "sum" },
+      { id: "sm_slicer", type: "slicer", title: "Plan Tier Slicer", dimensionField: "Plan_Tier", gridSpan: "half" },
+      { id: "sm_gauge", type: "gauge", title: "Net MRR Attainment Gauge", measureField: "Net_MRR", gridSpan: "half" },
       { id: "sm5", type: "line", title: "Net MRR Trajectory", dimensionField: "Month", measureField: "Net_MRR", gridSpan: "full" },
-      { id: "sm6", type: "bar", title: "MRR by Plan Tier", dimensionField: "Plan_Tier", measureField: "Net_MRR" },
+      { id: "sm6", type: "horizontal_bar", title: "MRR by Plan Tier", dimensionField: "Plan_Tier", measureField: "Net_MRR" },
       { id: "sm7", type: "donut", title: "Subscriber Share by Tier", dimensionField: "Plan_Tier", measureField: "Active_Subscribers" },
+      { id: "sm_table", type: "table", title: "Plan Tier Performance Table", dimensionField: "Plan_Tier", measureField: "Net_MRR", gridSpan: "full" },
     ],
   },
   {
@@ -159,9 +184,12 @@ export const MIS_TEMPLATES: MISTemplate[] = [
       { id: "ec1", type: "kpi", title: "Total E-Commerce Revenue", measureField: "Revenue", aggregation: "sum" },
       { id: "ec2", type: "kpi", title: "Sessions Traffic", measureField: "Sessions", aggregation: "sum" },
       { id: "ec3", type: "kpi", title: "Completed Checkouts", measureField: "Checkouts", aggregation: "sum" },
+      { id: "ec_funnel", type: "funnel", title: "Traffic Pipeline by Device", dimensionField: "Device_Type", measureField: "Sessions", gridSpan: "half" },
+      { id: "ec_gauge", type: "gauge", title: "Conversion Attainment", measureField: "Conversion_Rate", gridSpan: "half" },
       { id: "ec4", type: "line", title: "Revenue Timeline", dimensionField: "Date", measureField: "Revenue", gridSpan: "full" },
       { id: "ec5", type: "bar", title: "Revenue by Device Type", dimensionField: "Device_Type", measureField: "Revenue" },
       { id: "ec6", type: "donut", title: "Traffic Share by Device", dimensionField: "Device_Type", measureField: "Sessions" },
+      { id: "ec_table", type: "table", title: "Device Summary Grid", dimensionField: "Device_Type", measureField: "Revenue", gridSpan: "full" },
     ],
   },
   {

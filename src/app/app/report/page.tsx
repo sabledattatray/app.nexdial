@@ -169,6 +169,47 @@ export default function ReportDashboardPage() {
     setHasUnsavedChanges(true);
   };
 
+  // Interactive Slicer Click-to-Filter handler
+  const handleSlicerFilterToggle = (fieldName: string, value: string) => {
+    if (!fieldName) return;
+    if (value === "__ALL__") {
+      setFilters((prev) => prev.filter((f) => f.fieldName !== fieldName));
+      setHasUnsavedChanges(true);
+      return;
+    }
+
+    setFilters((prev) => {
+      const existing = prev.find((f) => f.fieldName === fieldName);
+      if (!existing) {
+        const newFilter: ReportFilter = {
+          id: `filter_${fieldName}_${Date.now()}`,
+          fieldId: fieldName,
+          fieldName,
+          type: "categorical",
+          operator: "in",
+          values: [value],
+        };
+        return [...prev, newFilter];
+      }
+
+      const currentValues = existing.values.map(String);
+      if (currentValues.includes(value)) {
+        const nextValues = currentValues.filter((v) => v !== value);
+        if (nextValues.length === 0) {
+          return prev.filter((f) => f.id !== existing.id);
+        }
+        return prev.map((f) =>
+          f.id === existing.id ? { ...f, values: nextValues } : f
+        );
+      } else {
+        return prev.map((f) =>
+          f.id === existing.id ? { ...f, values: [...currentValues, value] } : f
+        );
+      }
+    });
+    setHasUnsavedChanges(true);
+  };
+
   // Widget manipulation handlers
   const handleOpenAddWidget = () => {
     setEditingWidget(null);
@@ -893,6 +934,8 @@ export default function ReportDashboardPage() {
                 spec={kpi}
                 rows={filteredRows}
                 colorTheme={activeColorTheme}
+                activeFilters={filters}
+                onFilterSelect={handleSlicerFilterToggle}
                 onEdit={handleOpenEditWidget}
                 onDuplicate={handleDuplicateWidget}
                 onDelete={handleDeleteWidget}
@@ -1018,6 +1061,8 @@ export default function ReportDashboardPage() {
                     spec={spec}
                     rows={filteredRows}
                     colorTheme={activeColorTheme}
+                    activeFilters={filters}
+                    onFilterSelect={handleSlicerFilterToggle}
                     onEdit={handleOpenEditWidget}
                     onDuplicate={handleDuplicateWidget}
                     onDelete={handleDeleteWidget}
