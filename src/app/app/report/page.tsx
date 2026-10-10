@@ -54,6 +54,8 @@ import {
 } from "lucide-react";
 import { TemplateSwitcherBar } from "@/components/templates/TemplateSwitcherBar";
 import { TemplateSlideOverDrawer } from "@/components/templates/TemplateSlideOverDrawer";
+import { PopularTemplatesBar } from "@/components/templates/PopularTemplatesBar";
+import { TemplatesRightSidebar } from "@/components/templates/TemplatesRightSidebar";
 import { MIS_TEMPLATES, MISTemplate } from "@/lib/templates/template-registry";
 import { parseCsvString } from "@/lib/parsers/csv-parser";
 import { profileDataset } from "@/domain/dataset/profiler";
@@ -61,9 +63,9 @@ import { profileDataset } from "@/domain/dataset/profiler";
 export default function ReportDashboardPage() {
   const { profile, rows, isLoading, setLoadedDataset } = useDataset();
 
-  // Template Drawer, Shelf & Active Selection State
+  // Template Right Sidebar & Active Selection State
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [templateShelfOpen, setTemplateShelfOpen] = useState(true);
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
 
@@ -565,85 +567,40 @@ export default function ReportDashboardPage() {
       </div>
 
       {/* 1. Summary Header (PRD Section 7.5, 7.8 & 18) */}
-      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs min-w-0 print:hidden">
-        <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-4 min-w-0">
-          <div className="space-y-1.5 min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Visual Report Editor
-              </span>
-              <Badge variant="accent" className="gap-1 text-[11px]">
-                <Sparkles className="w-3 h-3" />
-                <span>Customizable Canvas</span>
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs min-w-0 print:hidden space-y-5">
+        {/* Top Control Bar: Category Badges (Left) + Action Toolbar Buttons (Right) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              Visual Report Editor
+            </span>
+            <Badge variant="accent" className="gap-1 text-[11px]">
+              <Sparkles className="w-3 h-3" />
+              <span>Customizable Canvas</span>
+            </Badge>
+            <Badge variant="success" className="gap-1 text-[11px]">
+              <ShieldCheck className="w-3 h-3" />
+              <span>100% Client-Side</span>
+            </Badge>
+            {hasUnsavedChanges && (
+              <Badge variant="warning" className="text-[10px]">
+                Unsaved Changes
               </Badge>
-              <Badge variant="success" className="gap-1 text-[11px]">
-                <ShieldCheck className="w-3 h-3" />
-                <span>100% Client-Side</span>
-              </Badge>
-              {hasUnsavedChanges && (
-                <Badge variant="warning" className="text-[10px]">
-                  Unsaved Changes
-                </Badge>
-              )}
-            </div>
-
-            <h1
-              className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 break-words"
-              title={reportTitle || profile.metadata.name}
-            >
-              {reportTitle || profile.metadata.name}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 pt-0.5">
-              <span>
-                <strong>{filteredRows.length.toLocaleString()}</strong> of{" "}
-                {rows.length.toLocaleString()} rows visible
-              </span>
-              <span>•</span>
-              <span>
-                <strong>{profile.fields.length}</strong> columns
-              </span>
-              <span>•</span>
-              <span>
-                <strong>{widgets.length}</strong> active widgets
-              </span>
-              <span>•</span>
-              <span>
-                Health:{" "}
-                <strong
-                  className={
-                    profile.qualityScore >= 80
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-amber-600 dark:text-amber-400"
-                  }
-                >
-                  {profile.qualityScore}%
-                </strong>
-              </span>
-            </div>
+            )}
           </div>
 
           {/* Action Toolbar */}
-          <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0 max-w-full">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
-              variant={drawerOpen ? "primary" : "accent"}
-              onClick={() => setDrawerOpen(true)}
-              className="gap-1.5 shadow-xs"
-              title="Open live MIS templates drawer to switch styles beside your report with zero scrolling"
+              variant={rightSidebarOpen ? "primary" : "outline"}
+              onClick={() => setRightSidebarOpen((v) => !v)}
+              className="gap-1.5 text-xs shadow-2xs"
+              title="Toggle right templates sidebar beside report"
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>MIS Templates (22)</span>
+              <span>Templates Sidebar (22)</span>
             </Button>
-
-            <a
-              href="#mis-templates-section"
-              className="hidden lg:inline-flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 font-medium px-2 py-1 transition-colors"
-              title="Jump to full template catalog behind report"
-            >
-              <span>Browse Behind</span>
-              <ChevronDown className="w-3 h-3" />
-            </a>
 
             <Button
               size="sm"
@@ -774,6 +731,69 @@ export default function ReportDashboardPage() {
             </Button>
           </div>
         </div>
+
+        {/* Main Content Area: Left Column (Dataset Title & Meta) + Right Column (5 Popular Templates + Dropdown) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+          {/* Left Column: Fixed Title and Dataset Details */}
+          <div className="lg:col-span-5 space-y-2 min-w-0">
+            <h1
+              className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50 truncate"
+              title={reportTitle || profile.metadata.name}
+            >
+              {reportTitle || profile.metadata.name}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <span>
+                <strong>{filteredRows.length.toLocaleString()}</strong> of{" "}
+                {rows.length.toLocaleString()} rows visible
+              </span>
+              <span>•</span>
+              <span>
+                <strong>{profile.fields.length}</strong> columns
+              </span>
+              <span>•</span>
+              <span>
+                <strong>{widgets.length}</strong> widgets
+              </span>
+              <span>•</span>
+              <span>
+                Health:{" "}
+                <strong
+                  className={
+                    profile.qualityScore >= 80
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-amber-600 dark:text-amber-400"
+                  }
+                >
+                  {profile.qualityScore}%
+                </strong>
+              </span>
+            </div>
+
+            {activeTemplateId && (
+              <div className="pt-1 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                <span>
+                  Active Layout:{" "}
+                  <strong>{MIS_TEMPLATES.find((t) => t.id === activeTemplateId)?.name}</strong>
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column (Fills the blank area): 5 Popular Templates + Dropdown Option */}
+          <div className="lg:col-span-7 min-w-0">
+            <PopularTemplatesBar
+              onApplyTemplateLayout={handleApplyTemplateLayout}
+              onLoadTemplateData={handleLoadTemplateData}
+              activeTemplateId={activeTemplateId}
+              loadingTemplateId={loadingTemplateId}
+              isRightSidebarOpen={rightSidebarOpen}
+              onToggleRightSidebar={() => setRightSidebarOpen((v) => !v)}
+            />
+          </div>
+        </div>
       </div>
 
       {/* 2. Global Interactive Filter Bar (PRD Section 7.8) */}
@@ -788,8 +808,12 @@ export default function ReportDashboardPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {/* 3. Executive KPI Cards Row (PRD Section 7.5) */}
-      {kpiWidgets.length > 0 && (
+      {/* Main Workspace Layout: Report Canvas (Left) + Right Templates Sidebar (Right) */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Complete Generated Report Dashboard */}
+        <div className={`${rightSidebarOpen ? "xl:col-span-8 2xl:col-span-9" : "xl:col-span-12"} space-y-6 min-w-0 transition-all duration-300`}>
+          {/* 3. Executive KPI Cards Row (PRD Section 7.5) */}
+          {kpiWidgets.length > 0 && (
         <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
@@ -952,72 +976,23 @@ export default function ReportDashboardPage() {
           </div>
         )}
       </section>
-
-      {/* 6. Section Behind Generated Report: MIS Templates Library (PRD Section 18 & 22 Styles) */}
-      <section
-        id="mis-templates-section"
-        className="space-y-4 pt-8 border-t-2 border-slate-200 dark:border-slate-800 print:hidden"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Templates Catalog
-              </span>
-              <Badge variant="accent" className="text-[10px] py-0 px-2 font-bold">
-                22 Styles Available
-              </Badge>
-              {activeTemplateId && (
-                <Badge variant="success" className="text-[10px] py-0 px-2 font-medium">
-                  Active: {MIS_TEMPLATES.find((t) => t.id === activeTemplateId)?.name}
-                </Badge>
-              )}
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
-              MIS Templates Library (Behind Generated Report)
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Browse all 22 domain-specific executive layouts below your active report. Click &ldquo;Apply Style&rdquo; to adapt your current dataset, or &ldquo;Load Data&rdquo; for realistic business data.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
-              }}
-              className="gap-1.5 text-xs"
-              title="Scroll back up to the top of your report"
-            >
-              <span>Back to Top of Report</span>
-            </Button>
-            <Button
-              size="sm"
-              variant="accent"
-              onClick={() => setDrawerOpen(true)}
-              className="gap-1.5 text-xs shadow-xs"
-              title="Open side-drawer for live switching with zero scrolling"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Open Side Drawer</span>
-            </Button>
-          </div>
         </div>
 
-        <TemplateSwitcherBar
-          isOpen={templateShelfOpen}
-          onToggleOpen={() => setTemplateShelfOpen((v) => !v)}
-          onApplyTemplateLayout={handleApplyTemplateLayout}
-          onLoadTemplateData={handleLoadTemplateData}
-          loadingTemplateId={loadingTemplateId}
-          activeTemplateId={activeTemplateId}
-        />
-      </section>
+        {/* Right Column: "RIGHT SIDEBAR BY MY SITE" containing all 22 MIS Templates */}
+        {rightSidebarOpen && (
+          <div className="xl:col-span-4 2xl:col-span-3 min-w-0 print:hidden">
+            <TemplatesRightSidebar
+              onApplyTemplateLayout={handleApplyTemplateLayout}
+              onLoadTemplateData={handleLoadTemplateData}
+              loadingTemplateId={loadingTemplateId}
+              activeTemplateId={activeTemplateId}
+              onClose={() => setRightSidebarOpen(false)}
+            />
+          </div>
+        )}
+      </div>
 
-      {/* Slide-Over Side Drawer for Live Preview Without Any Scrolling */}
+      {/* Slide-Over Side Drawer for Mobile/Compact View */}
       <TemplateSlideOverDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}

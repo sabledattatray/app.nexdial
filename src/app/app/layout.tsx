@@ -20,7 +20,7 @@ export default function WorkspaceLayout({
               <AppSidebar />
             </Suspense>
           </div>
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto overflow-x-hidden min-w-0 max-w-7xl w-full print:p-0 print:m-0 print:max-w-none print:w-full print:overflow-visible">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto overflow-x-hidden min-w-0 max-w-[1680px] w-full print:p-0 print:m-0 print:max-w-none print:w-full print:overflow-visible">
             <Suspense fallback={<div className="p-8 text-center text-sm text-slate-500">Loading workspace...</div>}>
               {children}
             </Suspense>
