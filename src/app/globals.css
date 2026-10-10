@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+:root {
+  /* Core Surface Tokens (Light Mode) */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  
+  /* Brand / Primary (Deep Indigo/Slate) */
+  --primary: #4338ca;
+  --primary-hover: #3730a3;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary / Neutral Surface */
+  --secondary: #f1f5f9;
+  --secondary-hover: #e2e8f0;
+  --secondary-foreground: #1e293b;
+  
+  /* Muted Text / Accents */
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  
+  --accent: #e0e7ff;
+  --accent-foreground: #312e81;
+  
+  /* Status / Feedback */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --info: #0284c7;
+  --info-foreground: #ffffff;
+  
+  /* Structural Tokens */
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --input: #cbd5e1;
+  --ring: #6366f1;
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Core Surface Tokens (Dark Mode) */
+  --background: #090d16;
+  --foreground: #f8fafc;
+  
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  
+  /* Brand / Primary */
+  --primary: #6366f1;
+  --primary-hover: #818cf8;
+  --primary-foreground: #ffffff;
+  
+  /* Secondary */
+  --secondary: #1e293b;
+  --secondary-hover: #334155;
+  --secondary-foreground: #f8fafc;
+  
+  /* Muted */
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  
+  --accent: #1e1b4b;
+  --accent-foreground: #c7d2fe;
+  
+  /* Status */
+  --destructive: #f87171;
+  --destructive-foreground: #450a0a;
+  --success: #34d399;
+  --success-foreground: #022c22;
+  --warning: #fbbf24;
+  --warning-foreground: #451a03;
+  --info: #38bdf8;
+  --info-foreground: #082f49;
+  
+  /* Structural */
+  --border: #1e293b;
+  --border-subtle: #141e33;
+  --input: #334155;
+  --ring: #818cf8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Print Media Optimization (PRD Section 7.11) */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  .page-break {
+    page-break-before: always;
+  }
+}
