@@ -174,9 +174,23 @@ export function Footer() {
 
         <div className="border-t border-slate-100 dark:border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 dark:text-slate-500 gap-4">
           <p>© {BRAND.year} {BRAND.name}. Free software licensed under MIT.</p>
-          <p className="flex items-center gap-1">
-            Built with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for Excel users, MIS analysts, and small businesses.
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-1">
+              Built with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for Excel users & MIS analysts.
+            </span>
+            <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+            <a
+              href="https://dattasable.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors inline-flex items-center gap-1 group"
+            >
+              <span>Made by</span>
+              <span className="underline decoration-indigo-400 decoration-1 underline-offset-2 group-hover:text-indigo-600">
+                Datta Sable
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     </footer>

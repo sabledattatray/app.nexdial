@@ -22,9 +22,12 @@ export const BRAND = {
   budgetNotice: "Strict ₹0 operating cost — completely free and open source.",
   privacyPromise:
     "Your data never leaves your device. All calculations, parsing, and chart rendering run locally in your browser.",
+  creator: "Datta Sable",
+  creatorUrl: "https://dattasable.com",
   links: {
-    github: "https://github.com/openmis/openmis",
-    issues: "https://github.com/openmis/openmis/issues",
+    github: "https://github.com/sabledattatray/app.nexdial",
+    issues: "https://github.com/sabledattatray/app.nexdial/issues",
+    creator: "https://dattasable.com",
     license: "/license",
     privacy: "/privacy",
     terms: "/terms",
