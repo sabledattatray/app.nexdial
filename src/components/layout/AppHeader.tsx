@@ -91,9 +91,18 @@ export function AppHeader({ datasetName: propName, rowCount: propRows }: AppHead
         <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
         <div className="flex items-center gap-2">
           {activeDatasetName ? (
-            <Badge variant="success" className="gap-1 px-2.5 py-1 text-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {activeDatasetName} {activeRowCount ? `(${activeRowCount.toLocaleString()} rows)` : ""}
+            <Badge
+              variant="success"
+              className="gap-1 px-2.5 py-1 text-xs max-w-[140px] sm:max-w-[280px] md:max-w-none"
+              title={`${activeDatasetName} ${activeRowCount ? `(${activeRowCount.toLocaleString()} rows)` : ""}`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="truncate">{activeDatasetName}</span>
+              {activeRowCount ? (
+                <span className="shrink-0 hidden sm:inline opacity-85 font-mono">
+                  ({activeRowCount.toLocaleString()} rows)
+                </span>
+              ) : null}
             </Badge>
           ) : (
             <Badge variant="secondary" className="gap-1 px-2.5 py-1 text-xs">

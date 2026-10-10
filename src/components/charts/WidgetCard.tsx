@@ -1285,6 +1285,9 @@ export function WidgetCard({
   // =========================================================================
   // VIEW 2: Interactive Dimension Slicer Visual
   // =========================================================================
+  // =========================================================================
+  // VIEW 2: Interactive Dimension Slicer Visual (Ultra-Compact & Executive)
+  // =========================================================================
   if (spec.type === "slicer") {
     const rawSlicer = (processedData as { slicerData?: { items: { label: string; count: number }[]; totalRows: number } } | null)?.slicerData;
     const allItems = rawSlicer?.items || [];
@@ -1295,34 +1298,38 @@ export function WidgetCard({
     );
 
     return (
-      <Card className="flex flex-col justify-between overflow-hidden shadow-2xs break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white border border-slate-200 dark:border-slate-800">
+      <Card className="flex flex-col overflow-hidden shadow-2xs hover:shadow-xs transition-shadow break-inside-avoid print:break-inside-avoid print:shadow-none print:border-slate-300 print:bg-white border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 rounded-xl">
         <div
-          className="h-1 w-full shrink-0"
+          className="h-0.5 w-full shrink-0"
           style={{ background: `linear-gradient(to right, ${palette.primary}, ${palette.accent})` }}
         />
-        <CardHeader className="p-4 border-b border-slate-100 dark:border-slate-800/80 flex flex-row items-center justify-between space-y-0 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 print:border print:border-slate-200">
-              <Sliders className="w-4 h-4" style={{ color: palette.primary }} />
+        <CardHeader className="p-2.5 px-3.5 border-b border-slate-100 dark:border-slate-800/70 flex flex-row items-center justify-between space-y-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-1 rounded-md bg-slate-100 dark:bg-slate-800 shrink-0 print:border print:border-slate-200">
+              <Sliders className="w-3.5 h-3.5" style={{ color: palette.primary }} />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-sm font-semibold print:text-slate-900">{spec.title}</CardTitle>
-                <Badge variant="outline" className="text-[10px]">
-                  {spec.dimensionField}
-                </Badge>
-              </div>
-              <CardDescription className="text-[11px]">Click items to filter all charts</CardDescription>
+            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+              <CardTitle className="text-xs font-semibold print:text-slate-900 text-slate-800 dark:text-slate-200 truncate">
+                {spec.title}
+              </CardTitle>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-mono text-slate-500">
+                {spec.dimensionField}
+              </Badge>
+              {activeValues.length > 0 && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  {activeValues.length} active
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-1 print:hidden">
+          <div className="flex items-center gap-1 shrink-0 print:hidden">
             {activeValues.length > 0 && onFilterSelect && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onFilterSelect(spec.dimensionField || "", "__ALL__")}
-                className="h-6 text-[10px] px-2 text-rose-500 hover:text-rose-600 gap-1"
+                className="h-6 text-[10px] px-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 gap-1 rounded font-medium"
                 title="Clear filter on this slicer"
               >
                 <X className="w-3 h-3" />
@@ -1333,7 +1340,7 @@ export function WidgetCard({
             {onMoveUp && (
               <button
                 onClick={() => onMoveUp(spec.id)}
-                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Move Earlier"
               >
                 <ArrowUp className="w-3.5 h-3.5" />
@@ -1343,7 +1350,7 @@ export function WidgetCard({
             {onMoveDown && (
               <button
                 onClick={() => onMoveDown(spec.id)}
-                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Move Later"
               >
                 <ArrowDown className="w-3.5 h-3.5" />
@@ -1353,7 +1360,7 @@ export function WidgetCard({
             {onEdit && (
               <button
                 onClick={() => onEdit(spec)}
-                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Edit Slicer"
               >
                 <Edit2 className="w-3.5 h-3.5" />
@@ -1363,7 +1370,7 @@ export function WidgetCard({
             {onDuplicate && (
               <button
                 onClick={() => onDuplicate(spec)}
-                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Duplicate Slicer"
               >
                 <Copy className="w-3.5 h-3.5" />
@@ -1373,7 +1380,7 @@ export function WidgetCard({
             {onDelete && (
               <button
                 onClick={() => setDeleteModalOpen(true)}
-                className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Delete Slicer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -1382,8 +1389,8 @@ export function WidgetCard({
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 flex-1 flex flex-col justify-start min-h-[300px] space-y-3">
-          {allItems.length > 5 && (
+        <CardContent className="p-3 px-3.5 flex flex-col justify-start space-y-2">
+          {allItems.length > 8 && (
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -1391,19 +1398,19 @@ export function WidgetCard({
                 value={slicerSearch}
                 onChange={(e) => setSlicerSearch(e.target.value)}
                 placeholder={`Search ${spec.dimensionField}...`}
-                className="w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full text-xs pl-8 pr-3 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2 max-h-[220px] overflow-y-auto pr-1">
+          <div className="flex flex-wrap items-center gap-1.5 max-h-[160px] overflow-y-auto pr-0.5 scrollbar-thin">
             {/* All / Clear Pill */}
             <button
               onClick={() => onFilterSelect?.(spec.dimensionField || "", "__ALL__")}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs border ${
+              className={`h-7 px-2.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs border active:scale-95 cursor-pointer ${
                 activeValues.length === 0
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent shadow-xs"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 border-transparent shadow-xs"
+                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
               }`}
             >
               <span>All Values</span>
@@ -1416,10 +1423,10 @@ export function WidgetCard({
                 <button
                   key={item.label}
                   onClick={() => onFilterSelect?.(spec.dimensionField || "", item.label)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all shadow-2xs border ${
+                  className={`h-7 px-2.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all shadow-2xs border active:scale-95 cursor-pointer ${
                     isSelected
                       ? "ring-2 ring-offset-1 text-white shadow-xs font-bold"
-                      : "bg-white dark:bg-slate-800/80 hover:border-slate-400 dark:hover:border-slate-600 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700"
+                      : "bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-700/60 hover:border-slate-400 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700"
                   }`}
                   style={
                     isSelected
@@ -1435,8 +1442,8 @@ export function WidgetCard({
                   <span
                     className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
                       isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"
+                        ? "bg-white/25 text-white"
+                        : "bg-slate-100 dark:bg-slate-700/80 text-slate-500 dark:text-slate-400"
                     }`}
                   >
                     {item.count}
@@ -1446,11 +1453,11 @@ export function WidgetCard({
             })}
           </div>
 
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+          <div className="pt-1 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500">
             <span>
-              {activeValues.length > 0 ? `${activeValues.length} active filter(s)` : "Unfiltered"}
+              {activeValues.length > 0 ? `${activeValues.length} active filter • click to toggle` : "Click any pill to cross-filter all visuals"}
             </span>
-            <span>{allItems.length} distinct segments</span>
+            <span>{allItems.length} segments</span>
           </div>
         </CardContent>
 

@@ -960,7 +960,7 @@ export default function ReportDashboardPage() {
           {/* 3. Executive KPI Cards Row (PRD Section 7.5) */}
           {kpiWidgets.length > 0 && (
         <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-1.5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
               Executive Key Performance Indicators
             </h2>
@@ -990,8 +990,8 @@ export default function ReportDashboardPage() {
       {/* 3.5 Interactive Dimensional Slicers Shelf */}
       {slicerWidgets.length > 0 ? (
         <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="p-1 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800">
                 <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               </div>
@@ -1003,7 +1003,7 @@ export default function ReportDashboardPage() {
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">
+              <span className="hidden md:inline text-xs text-slate-400">
                 Click pills to filter all dashboard visuals
               </span>
               <Button
@@ -1018,7 +1018,15 @@ export default function ReportDashboardPage() {
             </div>
           </div>
 
-          <div className={`grid grid-cols-1 ${slicerWidgets.length > 1 ? "lg:grid-cols-2" : ""} gap-4`}>
+          <div
+            className={`grid grid-cols-1 ${
+              slicerWidgets.length === 2
+                ? "md:grid-cols-2"
+                : slicerWidgets.length >= 3
+                ? "md:grid-cols-2 xl:grid-cols-3"
+                : ""
+            } gap-3`}
+          >
             {slicerWidgets.map((slicer) => (
               <WidgetCard
                 key={slicer.id}
@@ -1076,8 +1084,8 @@ export default function ReportDashboardPage() {
       {/* 4. Deterministic Statistical Insights Section (PRD Section 7.7) */}
       {deterministicInsights.length > 0 && (
         <section className="space-y-3 break-inside-avoid print:break-inside-avoid">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 print:text-slate-900">
                 Deterministic Business Insights
               </h2>
@@ -1085,7 +1093,7 @@ export default function ReportDashboardPage() {
                 Mathematical Proof
               </Badge>
             </div>
-            <span className="text-xs text-slate-400 print:text-slate-500">
+            <span className="hidden sm:inline text-xs text-slate-400 print:text-slate-500">
               Traceable formulas • Zero hallucination
             </span>
           </div>
