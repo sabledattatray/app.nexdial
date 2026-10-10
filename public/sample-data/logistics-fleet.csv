@@ -1,0 +1,16 @@
+Trip_ID,Route_Code,Driver,Distance_KM,Fuel_Litres,Delivery_Status,Transit_Hours
+TRP-101,DEL-MUM,Rajinder Kumar,1420,380,Delivered On-Time,24.5
+TRP-102,BLR-HYD,Suresh Reddy,570,145,Delivered On-Time,9.2
+TRP-103,MUM-AMD,Amitabh Joshi,530,138,Delivered On-Time,8.8
+TRP-104,KOL-PAT,Bikram Das,610,165,Delayed Weather,11.5
+TRP-105,CHN-BLR,Mani Shankar,350,92,Delivered On-Time,5.8
+TRP-106,DEL-JAIP,Harpal Singh,280,74,Delivered On-Time,4.5
+TRP-107,DEL-MUM,Baljeet Verma,1420,395,Delayed Traffic,26.0
+TRP-108,BLR-HYD,Praveen Rao,570,148,Delivered On-Time,9.0
+TRP-109,MUM-PUN,Deepak Patil,150,42,Delivered On-Time,3.2
+TRP-110,DEL-LKO,Santosh Yadav,520,135,Delivered On-Time,8.0
+TRP-111,CHN-HYD,Venkatesh Iyer,630,170,Delivered On-Time,10.2
+TRP-112,MUM-AMD,Chetan Shah,530,142,Delayed Inspection,10.0
+TRP-113,DEL-CHD,Jaswant Gill,250,68,Delivered On-Time,4.0
+TRP-114,KOL-BBI,Sourav Bose,440,118,Delivered On-Time,7.2
+TRP-115,BLR-COI,Karthik Nair,380,102,Delivered On-Time,6.1

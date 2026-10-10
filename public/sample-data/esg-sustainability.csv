@@ -1,0 +1,13 @@
+Facility,Country,Scope1_Tons,Scope2_Tons,Renewable_Energy_Pct,Waste_Diverted_Pct
+Bengaluru Tech Campus,India,124.5,410.0,68.5,84.0
+Frankfurt Data Center,Germany,45.0,850.0,92.0,91.5
+Austin Assembly Plant,USA,380.0,620.0,55.0,76.0
+Singapore Logistics Hub,Singapore,88.0,240.0,42.0,68.0
+London Corporate HQ,UK,32.0,180.0,85.0,89.0
+Tokyo R&D Center,Japan,64.0,290.0,60.0,82.5
+Pune Manufacturing Unit,India,420.0,710.0,48.0,71.0
+Sydney Operations Center,Australia,52.0,210.0,74.0,86.0
+Dublin Cloud Facility,Ireland,28.0,580.0,98.0,95.0
+Toronto Regional Office,Canada,38.0,160.0,80.0,88.0
+Mumbai Innovation Lab,India,95.0,340.0,52.0,74.5
+Seoul Engineering Hub,South Korea,72.0,280.0,64.0,79.0

@@ -1,0 +1,16 @@
+Loan_ID,Borrower_Segment,Loan_Amount,Interest_Rate,Risk_Rating,Default_Status
+LN-501,Corporate Wholesale,15000000.00,8.25,AAA,Performing
+LN-502,SME Commercial,3500000.00,10.50,BBB,Performing
+LN-503,Retail Mortgage,6500000.00,8.75,AA,Performing
+LN-504,Auto Loan,1200000.00,11.20,BBB,Performing
+LN-505,Microfinance,250000.00,16.50,BB,Watchlist
+LN-506,Corporate Wholesale,22000000.00,8.10,AAA,Performing
+LN-507,SME Commercial,4800000.00,11.00,BB,NPL Default
+LN-508,Retail Mortgage,8200000.00,8.50,AAA,Performing
+LN-509,Auto Loan,1450000.00,10.80,A,Performing
+LN-510,Microfinance,180000.00,17.00,B,NPL Default
+LN-511,Corporate Wholesale,18500000.00,8.30,AA,Performing
+LN-512,SME Commercial,5200000.00,10.75,A,Performing
+LN-513,Retail Mortgage,7100000.00,8.60,AA,Performing
+LN-514,Auto Loan,980000.00,11.50,BBB,Watchlist
+LN-515,Microfinance,310000.00,15.80,BB,Performing

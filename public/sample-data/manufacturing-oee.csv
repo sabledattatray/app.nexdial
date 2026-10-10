@@ -1,0 +1,13 @@
+Shift_Date,Assembly_Line,Total_Produced,Scrap_Units,Downtime_Minutes,OEE_Pct
+2026-01-05,CNC Milling Alpha,2450,42,35,88.4
+2026-01-05,Robotic Welder Beta,1980,68,55,82.1
+2026-01-05,Injection Mold Gamma,3890,28,20,94.2
+2026-01-05,Packaging Line Delta,4120,85,45,86.5
+2026-01-12,CNC Milling Alpha,2580,38,25,91.0
+2026-01-12,Robotic Welder Beta,2100,52,40,85.6
+2026-01-12,Injection Mold Gamma,4020,22,15,96.0
+2026-01-12,Packaging Line Delta,4350,74,38,89.1
+2026-01-19,CNC Milling Alpha,2390,48,42,86.8
+2026-01-19,Robotic Welder Beta,1890,75,65,79.5
+2026-01-19,Injection Mold Gamma,3780,31,25,93.0
+2026-01-19,Packaging Line Delta,3950,92,58,83.4

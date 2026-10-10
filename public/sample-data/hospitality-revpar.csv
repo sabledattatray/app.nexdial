@@ -1,0 +1,13 @@
+Date,Room_Type,Bookings_Count,Occupancy_Pct,ADR_USD,RevPAR_USD
+2026-01-05,Deluxe Ocean View,84,92.5,285.00,263.63
+2026-01-05,Executive Suite,38,88.0,450.00,396.00
+2026-01-05,Standard King,142,95.0,180.00,171.00
+2026-01-05,Presidential Villa,8,75.0,1250.00,937.50
+2026-01-12,Deluxe Ocean View,78,86.0,270.00,232.20
+2026-01-12,Executive Suite,34,80.0,425.00,340.00
+2026-01-12,Standard King,135,90.0,175.00,157.50
+2026-01-12,Presidential Villa,6,62.5,1250.00,781.25
+2026-01-19,Deluxe Ocean View,91,96.0,310.00,297.60
+2026-01-19,Executive Suite,42,94.0,490.00,460.60
+2026-01-19,Standard King,148,98.0,195.00,191.10
+2026-01-19,Presidential Villa,10,100.0,1400.00,1400.00

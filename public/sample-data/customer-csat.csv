@@ -1,0 +1,13 @@
+Feedback_Date,Channel,Satisfaction_Score,NPS_Category,First_Response_Mins,Agent_Name
+2026-01-05,Live Chat,4.8,Promoter,1.2,Ananya Sharma
+2026-01-05,Email Ticket,4.2,Passive,24.5,Rohit Verma
+2026-01-05,Phone Support,4.9,Promoter,0.8,Sneha Kulkarni
+2026-01-05,In-App Messaging,3.6,Detractor,4.5,Karan Malhotra
+2026-01-12,Live Chat,4.7,Promoter,1.5,Ananya Sharma
+2026-01-12,Email Ticket,4.5,Promoter,18.0,Rohit Verma
+2026-01-12,Phone Support,4.8,Promoter,1.0,Sneha Kulkarni
+2026-01-12,In-App Messaging,4.1,Passive,3.2,Karan Malhotra
+2026-01-19,Live Chat,4.9,Promoter,1.1,Ananya Sharma
+2026-01-19,Email Ticket,4.0,Passive,28.0,Rohit Verma
+2026-01-19,Phone Support,4.7,Promoter,1.2,Sneha Kulkarni
+2026-01-19,In-App Messaging,3.4,Detractor,5.8,Karan Malhotra

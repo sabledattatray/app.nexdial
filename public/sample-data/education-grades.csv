@@ -1,0 +1,16 @@
+Student_ID,Department,Course,Attendance_Pct,Assignment_Score,Final_Grade
+STU-201,Computer Science,Data Structures,94.0,88.5,91.0
+STU-202,Computer Science,Operating Systems,88.0,82.0,84.5
+STU-203,Business Admin,Financial Accounting,92.5,91.0,91.8
+STU-204,Business Admin,Marketing Strategy,85.0,78.5,80.2
+STU-205,Mechanical Eng,Thermodynamics,78.0,72.0,74.5
+STU-206,Mechanical Eng,Fluid Mechanics,82.0,79.0,80.0
+STU-207,Computer Science,Machine Learning,96.0,94.0,95.2
+STU-208,Business Admin,Corporate Finance,90.0,86.0,87.5
+STU-209,Mechanical Eng,Machine Design,84.0,81.0,82.0
+STU-210,Electrical Eng,Digital Signal Proc,89.0,85.5,86.8
+STU-211,Electrical Eng,Microcontrollers,91.0,88.0,89.5
+STU-212,Computer Science,Cloud Computing,95.0,92.5,93.4
+STU-213,Business Admin,Operations Research,86.0,80.0,82.0
+STU-214,Electrical Eng,Power Systems,80.0,74.0,76.5
+STU-215,Mechanical Eng,Robotics Automation,93.0,90.0,91.2

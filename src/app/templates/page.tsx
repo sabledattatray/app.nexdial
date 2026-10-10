@@ -23,17 +23,19 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { BRAND } from "@/lib/constants/brand";
 import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
 
+import { TemplateThumbnail } from "@/components/templates/TemplateThumbnail";
+
 export const metadata: Metadata = {
-  title: "MIS Dashboard Templates & Excel Starters | OpenMIS",
+  title: "22 MIS Dashboard Templates & Excel Starters | OpenMIS",
   description:
-    "Free production-ready MIS dashboard templates for Sales, Finance, Inventory, HR, Operations, Marketing, and Project tracking. 100% browser-side with synthetic sample data.",
+    "Free production-ready MIS dashboard templates for Executive C-Suite, SaaS, Sales, Finance, Inventory, HR, Operations, Healthcare, Logistics, and Retail. 100% browser-side with synthetic sample data.",
   alternates: {
     canonical: `${BRAND.url}/templates`,
   },
   openGraph: {
-    title: "Free MIS Dashboard Templates | OpenMIS",
+    title: "22 Free MIS Dashboard Templates | OpenMIS",
     description:
-      "Explore 7 ready-to-use business MIS templates with synthetic datasets. Launch directly into the workspace with ₹0 cost and zero cloud uploads.",
+      "Explore 22 ready-to-use business MIS templates with synthetic datasets. Launch directly into the workspace with ₹0 cost and zero cloud uploads.",
     url: `${BRAND.url}/templates`,
   },
 };
@@ -82,13 +84,13 @@ export default function PublicTemplatesPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800">
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>7 Ready-to-Use Business Layouts</span>
+              <span>22 Ready-to-Use Business Layouts</span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight">
               Production MIS Dashboard Templates
             </h1>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Pre-configured executive reporting templates built for Excel and CSV datasets. Each template includes realistic synthetic sample data and automated KPI widgets.
+              Pre-configured executive reporting templates built for Excel and CSV datasets. Each template includes realistic synthetic sample data, visual layout thumbnails, and automated KPI widgets.
             </p>
           </div>
         </section>
@@ -101,38 +103,46 @@ export default function PublicTemplatesPage() {
               return (
                 <Card
                   key={tmpl.id}
-                  className="p-6 flex flex-col justify-between border-slate-200/80 dark:border-slate-800 hover:shadow-lg transition-all"
+                  className="p-5 flex flex-col justify-between border-slate-200/80 dark:border-slate-800 hover:shadow-lg transition-all overflow-hidden group"
                 >
                   <div className="space-y-4">
+                    {/* Visual Vector Mini-Thumbnail */}
+                    <Link href={`/app/templates?load=${tmpl.id}`}>
+                      <TemplateThumbnail
+                        layoutStyle={tmpl.layoutStyle}
+                        colorTheme={tmpl.colorTheme}
+                        title={tmpl.name}
+                      />
+                    </Link>
+
                     <div className="flex items-center justify-between">
                       <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <Badge variant="outline" className="text-xs uppercase">
+                      <Badge variant="outline" className="text-[10px] uppercase font-semibold">
                         {tmpl.category}
                       </Badge>
                     </div>
 
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {tmpl.name}
                     </h2>
 
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
                       {tmpl.description}
                     </p>
 
-                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-1.5 text-xs">
-                      <div className="font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-1 text-xs">
+                      <div className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
                         Configured Widgets:
                       </div>
-                      <div className="text-slate-500 dark:text-slate-400">
-                        {tmpl.widgets.length} executive cards (
-                        {tmpl.widgets.map((w) => w.type).join(", ")})
+                      <div className="text-slate-500 dark:text-slate-400 text-[11px]">
+                        {tmpl.widgets.length} executive cards ({tmpl.widgets.map((w) => w.type).join(", ")})
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                  <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
                     <Link href={`/app/templates?load=${tmpl.id}`}>
                       <Button className="w-full gap-2 text-xs font-semibold">
                         <Sparkles className="w-3.5 h-3.5" />

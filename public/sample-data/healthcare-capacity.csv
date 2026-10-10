@@ -1,0 +1,16 @@
+Date,Department,Patients_Admitted,Bed_Occupancy_Pct,Avg_Wait_Mins,Doctor_Staff
+2026-01-05,Emergency Triage,142,94.5,38,18
+2026-01-05,Cardiology Ward,68,88.0,22,12
+2026-01-05,Pediatrics,54,76.5,18,10
+2026-01-05,Orthopedics,42,82.0,25,8
+2026-01-05,Intensive Care (ICU),28,96.0,12,14
+2026-01-12,Emergency Triage,156,98.0,45,19
+2026-01-12,Cardiology Ward,72,91.5,24,12
+2026-01-12,Pediatrics,60,80.0,19,11
+2026-01-12,Orthopedics,46,85.0,28,8
+2026-01-12,Intensive Care (ICU),30,98.5,10,15
+2026-01-19,Emergency Triage,138,91.0,32,18
+2026-01-19,Cardiology Ward,65,85.0,20,12
+2026-01-19,Pediatrics,48,72.0,15,10
+2026-01-19,Orthopedics,39,78.0,21,8
+2026-01-19,Intensive Care (ICU),26,92.0,14,14

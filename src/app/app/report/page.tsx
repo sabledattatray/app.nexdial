@@ -50,10 +50,20 @@ import {
   Trash2,
   ChevronDown,
   FileCode,
+  Layers,
 } from "lucide-react";
+import { TemplateSwitcherBar } from "@/components/templates/TemplateSwitcherBar";
+import { MISTemplate } from "@/lib/templates/template-registry";
+import { parseCsvString } from "@/lib/parsers/csv-parser";
+import { profileDataset } from "@/domain/dataset/profiler";
 
 export default function ReportDashboardPage() {
-  const { profile, rows, isLoading } = useDataset();
+  const { profile, rows, isLoading, setLoadedDataset } = useDataset();
+
+  // Template Shelf & Active Selection State
+  const [templateShelfOpen, setTemplateShelfOpen] = useState(false);
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
 
   // 1. Default recommendations
   const defaultWidgets = useMemo(() => {
@@ -209,7 +219,131 @@ export default function ReportDashboardPage() {
     setCustomWidgets(null);
     setCustomTitle(null);
     setFilters([]);
+    setActiveTemplateId(null);
     setHasUnsavedChanges(true);
+  };
+
+  // Apply a template's architectural layout & chart widgets to current loaded data
+  const handleApplyTemplateLayout = (template: MISTemplate) => {
+    if (!profile) return;
+
+    const numericFields = profile.fields.filter(
+      (f) => f.role === "measure" || f.userType === "number" || f.userType === "integer"
+    );
+    const catFields = profile.fields.filter(
+      (f) => f.role === "dimension" || f.userType === "categorical" || f.userType === "text" || f.userType === "date"
+    );
+    const dateFields = profile.fields.filter((f) => f.userType === "date");
+
+    const defaultNum = numericFields[0]?.name || profile.fields[0]?.name || "Value";
+    const defaultCat = catFields[0]?.name || profile.fields[0]?.name || "Category";
+    const defaultDate = dateFields[0]?.name || defaultCat;
+
+    const mappedWidgets: WidgetDefinition[] = template.widgets.map((tw, index) => {
+      // Find matching measure or fallback
+      let mField = defaultNum;
+      if (tw.measureField && profile.fields.some((f) => f.name.toLowerCase() === tw.measureField?.toLowerCase())) {
+        mField = profile.fields.find((f) => f.name.toLowerCase() === tw.measureField?.toLowerCase())!.name;
+      } else {
+        const numIdx = index % Math.max(1, numericFields.length);
+        mField = numericFields[numIdx]?.name || defaultNum;
+      }
+
+      // Find matching dimension or fallback
+      let dField = defaultCat;
+      if (tw.type === "line" || tw.type === "area") {
+        dField = defaultDate;
+      } else if (tw.dimensionField && profile.fields.some((f) => f.name.toLowerCase() === tw.dimensionField?.toLowerCase())) {
+        dField = profile.fields.find((f) => f.name.toLowerCase() === tw.dimensionField?.toLowerCase())!.name;
+      } else {
+        const catIdx = index % Math.max(1, catFields.length);
+        dField = catFields[catIdx]?.name || defaultCat;
+      }
+
+      let secMeasure: string | undefined = undefined;
+      if (tw.secondaryMeasureField && profile.fields.some((f) => f.name.toLowerCase() === tw.secondaryMeasureField?.toLowerCase())) {
+        secMeasure = profile.fields.find((f) => f.name.toLowerCase() === tw.secondaryMeasureField?.toLowerCase())!.name;
+      } else if (tw.type === "scatter" && numericFields.length > 1) {
+        secMeasure = numericFields[1]?.name;
+      }
+
+      const widgetType = (tw.type === "column" ? "bar" : tw.type) as WidgetDefinition["type"];
+
+      return {
+        id: `tpl_w_${Date.now()}_${index}`,
+        type: widgetType,
+        title: tw.title,
+        measureField: mField,
+        dimensionField: tw.type === "kpi" ? undefined : dField,
+        secondaryMeasureField: secMeasure,
+        aggregation: (tw.aggregation === "avg" ? "average" : tw.aggregation || "sum") as WidgetDefinition["aggregation"],
+        gridSpan: tw.gridSpan === "full" ? "full" : "half",
+        topN: tw.topN || (tw.type === "bar" || tw.type === "donut" ? 10 : undefined),
+        whyThisChart: `Configured from ${template.name} architecture.`,
+      };
+    });
+
+    setCustomWidgets(mappedWidgets);
+    setCustomTitle(`${template.name} • ${profile.metadata.name}`);
+    setActiveTemplateId(template.id);
+    setHasUnsavedChanges(true);
+    setSaveSuccessMessage(`Applied "${template.name}" layout! Live report updated below.`);
+    setTimeout(() => setSaveSuccessMessage(null), 4000);
+  };
+
+  // Load a template's complete synthetic dataset into memory & render live report
+  const handleLoadTemplateData = async (template: MISTemplate) => {
+    try {
+      setLoadingTemplateId(template.id);
+      const response = await fetch(`/sample-data/${template.filename}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load template data: ${response.statusText}`);
+      }
+      const csvText = await response.text();
+      const parseResult = await parseCsvString(csvText);
+      const newProfile = profileDataset(parseResult.rows, parseResult.headers, {
+        id: `tpl_${template.id}`,
+        name: template.filename.replace(".csv", "").toUpperCase(),
+        sourceFormat: "csv",
+        sizeBytes: csvText.length,
+        importedAt: new Date().toISOString(),
+      });
+
+      setLoadedDataset(newProfile, parseResult.rows, {
+        rows: parseResult.rows,
+        headers: parseResult.headers,
+      });
+
+      const templateWidgets: WidgetDefinition[] = template.widgets.map((tw, index) => ({
+        id: `tpl_w_${template.id}_${index}`,
+        type: (tw.type === "column" ? "bar" : tw.type) as WidgetDefinition["type"],
+        title: tw.title,
+        measureField: tw.measureField || newProfile.fields.find((f) => f.role === "measure")?.name,
+        dimensionField:
+          tw.type === "kpi"
+            ? undefined
+            : tw.dimensionField || newProfile.fields.find((f) => f.role === "dimension")?.name,
+        secondaryMeasureField: tw.secondaryMeasureField,
+        aggregation: (tw.aggregation === "avg" ? "average" : tw.aggregation || "sum") as WidgetDefinition["aggregation"],
+        gridSpan: tw.gridSpan === "full" ? "full" : "half",
+        topN: tw.topN || (tw.type === "bar" || tw.type === "donut" ? 10 : undefined),
+        whyThisChart: `Loaded from ${template.name}`,
+      }));
+
+      setCustomWidgets(templateWidgets);
+      setCustomTitle(template.name);
+      setActiveTemplateId(template.id);
+      setFilters([]);
+      setHasUnsavedChanges(false);
+      setSaveSuccessMessage(
+        `Loaded "${template.name}" (${parseResult.rows.length.toLocaleString()} rows). Live report ready!`
+      );
+      setTimeout(() => setSaveSuccessMessage(null), 4000);
+    } catch (err) {
+      alert(`Error loading template: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setLoadingTemplateId(null);
+    }
   };
 
   // Local Persistence Handlers
@@ -373,6 +507,16 @@ export default function ReportDashboardPage() {
         </div>
       )}
 
+      {/* Interactive MIS Template Gallery Shelf */}
+      <TemplateSwitcherBar
+        isOpen={templateShelfOpen}
+        onToggleOpen={() => setTemplateShelfOpen((v) => !v)}
+        onApplyTemplateLayout={handleApplyTemplateLayout}
+        onLoadTemplateData={handleLoadTemplateData}
+        loadingTemplateId={loadingTemplateId}
+        activeTemplateId={activeTemplateId}
+      />
+
       {/* Dedicated Executive Boardroom Print Header (Visible ONLY when printing) */}
       <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 break-inside-avoid">
         <div className="flex items-center justify-between">
@@ -482,6 +626,17 @@ export default function ReportDashboardPage() {
 
           {/* Action Toolbar */}
           <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0 max-w-full">
+            <Button
+              size="sm"
+              variant={templateShelfOpen ? "primary" : "accent"}
+              onClick={() => setTemplateShelfOpen((v) => !v)}
+              className="gap-1.5 shadow-xs"
+              title="Open MIS template gallery to live-preview or apply 22 production styles"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>MIS Templates (22)</span>
+            </Button>
+
             <Button
               size="sm"
               onClick={handleOpenAddWidget}

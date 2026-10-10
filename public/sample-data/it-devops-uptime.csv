@@ -1,0 +1,13 @@
+Date,Service_Name,Uptime_Pct,API_Latency_MS,Cloud_Cost_USD,Incident_Count
+2026-01-05,Auth & Identity API,99.98,42,1240.00,0
+2026-01-05,Payment Gateway Core,99.99,65,2450.00,0
+2026-01-05,Search Engine Elastic,99.85,115,3100.00,1
+2026-01-05,Media Streaming CDN,99.95,35,4200.00,0
+2026-01-12,Auth & Identity API,99.95,45,1310.00,0
+2026-01-12,Payment Gateway Core,99.99,58,2580.00,0
+2026-01-12,Search Engine Elastic,99.90,95,3250.00,0
+2026-01-12,Media Streaming CDN,99.92,38,4450.00,1
+2026-01-19,Auth & Identity API,99.99,39,1290.00,0
+2026-01-19,Payment Gateway Core,99.98,62,2620.00,0
+2026-01-19,Search Engine Elastic,99.78,140,3400.00,2
+2026-01-19,Media Streaming CDN,99.96,32,4600.00,0

@@ -1,0 +1,13 @@
+Date,Store_Location,Register_No,Gross_Sales,Transaction_Count,Return_Value
+2026-01-05,Downtown Flagship,REG-01,18500.00,420,380.00
+2026-01-05,Suburban Mall,REG-02,14200.00,340,290.00
+2026-01-05,Airport Concourse,REG-03,22400.00,510,180.00
+2026-01-05,Metro Station West,REG-04,9800.00,260,140.00
+2026-01-12,Downtown Flagship,REG-01,21200.00,460,420.00
+2026-01-12,Suburban Mall,REG-02,15900.00,380,310.00
+2026-01-12,Airport Concourse,REG-03,24800.00,550,210.00
+2026-01-12,Metro Station West,REG-04,11200.00,290,160.00
+2026-01-19,Downtown Flagship,REG-01,19400.00,430,360.00
+2026-01-19,Suburban Mall,REG-02,16800.00,390,340.00
+2026-01-19,Airport Concourse,REG-03,26100.00,580,240.00
+2026-01-19,Metro Station West,REG-04,10500.00,270,150.00
