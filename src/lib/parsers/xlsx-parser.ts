@@ -52,17 +52,34 @@ export function parseXlsxSheet(
     raw: false, // Format values as strings/dates where appropriate
   });
 
+  const sanitizeKey = (key: string): string => {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      return `_${key}_`;
+    }
+    return key;
+  };
+
   // Extract headers from first non-empty row or sheet range
   const headers: string[] = [];
   if (rawRows.length > 0) {
     Object.keys(rawRows[0]).forEach((h) => {
-      if (h && !headers.includes(h)) headers.push(h);
+      const safeH = sanitizeKey(h);
+      if (safeH && !headers.includes(safeH)) headers.push(safeH);
     });
   }
+
+  // Sanitize rows against prototype pollution
+  const sanitizedRows: RowData[] = rawRows.map((raw) => {
+    const cleanRow: RowData = {};
+    for (const [k, v] of Object.entries(raw)) {
+      cleanRow[sanitizeKey(k)] = v;
+    }
+    return cleanRow;
+  });
 
   return {
     sheetName: targetSheetName,
     headers,
-    rows: rawRows as RowData[],
+    rows: sanitizedRows,
   };
 }

@@ -31,9 +31,26 @@ export function parseCsvString(
       dynamicTyping: true,
       delimiter: options?.delimiter || "", // Empty string enables auto-detection
       complete: (results) => {
-        const headers = results.meta.fields || [];
+        const sanitizeKey = (key: string): string => {
+          if (key === "__proto__" || key === "constructor" || key === "prototype") {
+            return `_${key}_`;
+          }
+          return key;
+        };
+
+        const rawHeaders = results.meta.fields || [];
+        const headers = rawHeaders.map(sanitizeKey);
         const detectedDelimiter = results.meta.delimiter || ",";
-        const rows: RowData[] = results.data as RowData[];
+        const rawRows = results.data as Record<string, unknown>[];
+
+        const rows: RowData[] = rawRows.map((raw) => {
+          const cleanRow: RowData = {};
+          for (const [k, v] of Object.entries(raw)) {
+            cleanRow[sanitizeKey(k)] = v;
+          }
+          return cleanRow;
+        });
+
         const errors = results.errors.map((e) => `Row ${e.row}: ${e.message}`);
 
         resolve({
