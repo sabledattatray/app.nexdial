@@ -29,9 +29,13 @@ import {
   Check,
   ChevronDown,
   ArrowUpDown,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import { useDataset } from "@/context/DatasetContext";
 import { DataType } from "@/domain/dataset/types";
+import { exportToCsv } from "@/lib/export/csv-exporter";
+import { exportToXlsx } from "@/lib/export/xlsx-exporter";
 
 export default function DataProfilingPage() {
   const router = useRouter();
@@ -196,6 +200,28 @@ export default function DataProfilingPage() {
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
             Clear Data
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportToCsv(rows, profile.fields, `${profile.metadata.name}_cleaned.csv`)}
+            className="text-xs h-8 gap-1.5"
+            title="Download cleaned data as CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export CSV</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportToXlsx(rows, profile.fields, "Cleaned_Data", `${profile.metadata.name}_cleaned.xlsx`)}
+            className="text-xs h-8 gap-1.5"
+            title="Download cleaned data as Excel workbook"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500" />
+            <span>Export Excel</span>
           </Button>
 
           <Link href="/app/report">

@@ -19,6 +19,8 @@ import {
   listSavedReportsLocally,
   deleteReportLocally,
 } from "@/lib/storage/report-storage";
+import { exportToCsv } from "@/lib/export/csv-exporter";
+import { exportToXlsx } from "@/lib/export/xlsx-exporter";
 import { WidgetCard } from "@/components/charts/WidgetCard";
 import { GlobalFilterBar } from "@/components/dashboard/GlobalFilterBar";
 import { WidgetInspectorModal } from "@/components/editor/WidgetInspectorModal";
@@ -451,6 +453,28 @@ export default function ReportDashboardPage() {
             >
               <Download className="w-3.5 h-3.5 text-slate-500" />
               <span>Export JSON</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportToCsv(filteredRows, profile.fields, `${reportTitle}.csv`)}
+              className="gap-1.5"
+              title="Download sanitized CSV honoring active filters"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span>Export CSV</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportToXlsx(filteredRows, profile.fields, "MIS_Report", `${reportTitle}.xlsx`)}
+              className="gap-1.5"
+              title="Download sanitized Excel workbook honoring active filters"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500" />
+              <span>Export Excel</span>
             </Button>
 
             <label className="cursor-pointer">

@@ -1,5 +1,11 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDataset } from "@/context/DatasetContext";
+import { parseCsvString } from "@/lib/parsers/csv-parser";
+import { profileDataset } from "@/domain/dataset/profiler";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -13,9 +19,16 @@ import {
   CheckSquare,
   ArrowRight,
   ArrowLeft,
+  Download,
+  Loader2,
+  Sparkles,
 } from "lucide-react";
 
 export default function TemplatesPage() {
+  const router = useRouter();
+  const { setLoadedDataset } = useDataset();
+  const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
+
   const templates = [
     {
       id: "sales",
@@ -23,8 +36,9 @@ export default function TemplatesPage() {
       category: "Sales & Revenue",
       desc: "Track sales performance by region, rep leaderboard, deal volume, average transaction size, and month-over-month growth.",
       icon: TrendingUp,
+      filename: "sales-mis.csv",
       requiredColumns: ["Date", "Sales_Rep", "Region", "Category", "Revenue", "Units_Sold"],
-      metrics: ["Total Revenue", "Avg Deal Size", "Total Units", "MoM Growth"],
+      metrics: ["Total Revenue", "Avg Deal Size", "Total Units", "Regional Breakdown"],
       fictionalRows: 1420,
     },
     {
@@ -33,6 +47,7 @@ export default function TemplatesPage() {
       category: "Accounting & Finance",
       desc: "Analyze departmental expenditure, budget vs actual variance, vendor concentration, and monthly burn rate.",
       icon: Receipt,
+      filename: "finance-expense.csv",
       requiredColumns: ["Date", "Department", "Vendor", "Category", "Actual_Spend", "Budget_Allocated"],
       metrics: ["Total Spend", "Budget Variance", "Vendor Concentration", "Over-Budget Count"],
       fictionalRows: 980,
@@ -43,6 +58,7 @@ export default function TemplatesPage() {
       category: "Supply Chain & Warehousing",
       desc: "Monitor warehouse stock levels, SKUs nearing depletion, safety stock thresholds, and stock valuation.",
       icon: Boxes,
+      filename: "inventory-stock.csv",
       requiredColumns: ["SKU", "Item_Name", "Warehouse", "Current_Stock", "Reorder_Level", "Unit_Cost"],
       metrics: ["Total Valuation", "Out of Stock Count", "Reorder Alerts", "Warehouse Fill %"],
       fictionalRows: 850,
@@ -53,6 +69,7 @@ export default function TemplatesPage() {
       category: "Human Resources",
       desc: "Summarize department headcount, attendance ratios, overtime expenditures, and employee turnover trends.",
       icon: Users,
+      filename: "hr-attendance.csv",
       requiredColumns: ["Employee_ID", "Department", "Role", "Join_Date", "Attendance_Pct", "Overtime_Hours"],
       metrics: ["Total Headcount", "Avg Attendance", "Total Overtime", "Dept Breakdown"],
       fictionalRows: 420,
@@ -63,6 +80,7 @@ export default function TemplatesPage() {
       category: "Operations & Support",
       desc: "Evaluate ticket resolution times, SLA breach rates, operational backlog, and agent efficiency.",
       icon: Timer,
+      filename: "operations-sla.csv",
       requiredColumns: ["Ticket_ID", "Created_Date", "Priority", "Resolution_Hours", "SLA_Status", "Agent"],
       metrics: ["SLA Compliance %", "Avg Resolution Time", "Total Tickets", "Breach Count"],
       fictionalRows: 2150,
@@ -73,6 +91,7 @@ export default function TemplatesPage() {
       category: "Marketing & Growth",
       desc: "Review campaign spend, impressions, click-through rates, lead conversions, and acquisition cost.",
       icon: Megaphone,
+      filename: "marketing-campaigns.csv",
       requiredColumns: ["Campaign_Name", "Channel", "Spend", "Impressions", "Clicks", "Conversions"],
       metrics: ["Total Spend", "Cost Per Acquisition (CPA)", "Overall CTR", "Total Conversions"],
       fictionalRows: 640,
@@ -83,14 +102,53 @@ export default function TemplatesPage() {
       category: "Project Management",
       desc: "Track task completion rates, blocked items, sprint velocity, and resource workload across projects.",
       icon: CheckSquare,
+      filename: "project-tasks.csv",
       requiredColumns: ["Task_ID", "Project_Name", "Assignee", "Status", "Priority", "Estimated_Hours"],
       metrics: ["Completion Rate", "Blocked Tasks", "Total Estimated Hours", "High Priority Count"],
       fictionalRows: 510,
     },
   ];
 
+  const handleLoadTemplate = React.useCallback(
+    async (templateId: string, filename: string) => {
+      try {
+        setLoadingTemplateId(templateId);
+        const response = await fetch(`/sample-data/${filename}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load sample data: ${response.statusText}`);
+        }
+        const csvText = await response.text();
+
+        // 1. Parse CSV string
+        const parseResult = await parseCsvString(csvText);
+
+        // 2. Profile dataset
+        const profile = profileDataset(parseResult.rows, parseResult.headers, {
+          id: `tpl_${templateId}`,
+          name: filename.replace(".csv", "").toUpperCase(),
+          sourceFormat: "csv",
+          sizeBytes: csvText.length,
+          importedAt: "2026-10-10T00:00:00.000Z",
+        });
+
+        // 3. Load into dataset context
+        setLoadedDataset(profile, parseResult.rows, {
+          rows: parseResult.rows,
+          headers: parseResult.headers,
+        });
+
+        // 4. Navigate to report dashboard
+        router.push("/app/report");
+      } catch (err) {
+        alert(`Error loading template: ${err instanceof Error ? err.message : String(err)}`);
+        setLoadingTemplateId(null);
+      }
+    },
+    [router, setLoadedDataset]
+  );
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8 pb-12">
       {/* Header */}
       <div className="space-y-2">
         <Link
@@ -106,7 +164,7 @@ export default function TemplatesPage() {
               MIS Report Templates
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Pre-configured business reporting layouts. Load with synthetic sample data or map your own spreadsheet columns.
+              Pre-configured business reporting layouts. Load with synthetic sample data or download the CSV to inspect columns.
             </p>
           </div>
           <Badge variant="secondary" className="self-start sm:self-auto gap-1">
@@ -119,8 +177,14 @@ export default function TemplatesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((tpl) => {
           const Icon = tpl.icon;
+          const isLoading = loadingTemplateId === tpl.id;
+
           return (
-            <Card key={tpl.id} id={tpl.id} className="flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-700 transition-all">
+            <Card
+              key={tpl.id}
+              id={tpl.id}
+              className="flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-2xs"
+            >
               <CardHeader className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
@@ -172,23 +236,43 @@ export default function TemplatesPage() {
                 </div>
               </CardContent>
 
-              <CardFooter className="flex items-center justify-between pt-4">
-                <span className="text-xs text-slate-400 font-medium">
-                  {tpl.fictionalRows.toLocaleString()} synthetic rows
-                </span>
-                <Link href={`/app/new?template=${tpl.id}`}>
-                  <Button size="sm" variant="primary" className="gap-1.5 text-xs">
-                    <span>Use Template</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Button>
-                </Link>
+              <CardFooter className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800/80 gap-2">
+                <a
+                  href={`/sample-data/${tpl.filename}`}
+                  download={tpl.filename}
+                  className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  title={`Download sample ${tpl.filename}`}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Sample CSV</span>
+                </a>
+
+                <Button
+                  size="sm"
+                  disabled={isLoading}
+                  onClick={() => handleLoadTemplate(tpl.id, tpl.filename)}
+                  className="gap-1.5 text-xs shadow-xs"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Profiling...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Load Template</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </Button>
               </CardFooter>
             </Card>
           );
         })}
       </div>
 
-      {/* Notice on Fictional Datasets */}
+      {/* Notice on Fictional Datasets (PRD 7.14) */}
       <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
         <p>
           <strong>Notice:</strong> All sample data shipped with OpenMIS templates is strictly fictional and generated for demonstration purposes. No real personal or corporate financial data is included.

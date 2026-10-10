@@ -130,14 +130,31 @@ body {
     color: #000000 !important;
   }
   
-  .no-print {
+  /* Hide navigation bars, sidebars, interactive buttons in print */
+  header,
+  aside,
+  nav,
+  button,
+  .print\:hidden {
     display: none !important;
   }
-  
-  .print-only {
-    display: block !important;
+
+  /* Maximize main canvas area */
+  main {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
   }
-  
+
+  /* Clean card borders without heavy shadows */
+  div[class*="rounded-2xl"],
+  div[class*="rounded-xl"] {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    break-inside: avoid;
+  }
+
   .page-break {
     page-break-before: always;
   }
