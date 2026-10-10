@@ -10,18 +10,21 @@ import { BookOpen, Clock, ArrowRight, Sparkles, CheckCircle2 } from "lucide-reac
 import { EDUCATIONAL_GUIDES } from "@/lib/guides/guide-data";
 import { JsonLd } from "@/components/seo/JsonLd";
 
+import { BRAND } from "@/lib/constants/brand";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Spreadsheet Analytics & MIS Reporting Guides | OpenMIS",
   description:
     "Free practical guides on spreadsheet data cleaning, chart type selection, sales growth mathematics, and CSV formula injection security.",
   alternates: {
-    canonical: "https://openmis.dev/guides",
+    canonical: `${BRAND.url}/guides`,
   },
   openGraph: {
     title: "Spreadsheet Analytics & MIS Reporting Guides | OpenMIS",
     description:
       "Master spreadsheet data cleaning, chart selection, and executive MIS reporting with reproducible steps and transparent formulas.",
-    url: "https://openmis.dev/guides",
+    url: `${BRAND.url}/guides`,
     type: "website",
   },
 };
@@ -29,19 +32,27 @@ export const metadata: Metadata = {
 export default function GuidesIndexPage() {
   const guides = Object.values(EDUCATIONAL_GUIDES);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "OpenMIS Educational Guides",
-    description: "Guides on spreadsheet data cleaning, chart selection, and MIS reporting.",
-    url: "https://openmis.dev/guides",
-    hasPart: guides.map((g) => ({
-      "@type": "Article",
-      headline: g.title,
-      description: g.description,
-      url: `https://openmis.dev/guides/${g.slug}`,
-    })),
-  };
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Educational Guides", path: "/guides" },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "OpenMIS Educational Guides",
+      description: "Guides on spreadsheet data cleaning, chart selection, and MIS reporting.",
+      url: `${BRAND.url}/guides`,
+      hasPart: guides.map((g) => ({
+        "@type": "Article",
+        headline: g.title,
+        description: g.description,
+        url: `${BRAND.url}/guides/${g.slug}`,
+      })),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

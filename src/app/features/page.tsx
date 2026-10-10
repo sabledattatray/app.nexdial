@@ -20,44 +20,53 @@ import {
 } from "lucide-react";
 import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Features & Technical Capabilities | OpenMIS",
   description:
     "Explore OpenMIS features: 100% browser-side parsing, automated data profiler, reversible cleaning, deterministic analytics, ECharts canvas, and formula injection defense.",
   alternates: {
-    canonical: "https://openmis.dev/features",
+    canonical: `${BRAND.url}/features`,
   },
   openGraph: {
     title: "Features & Architecture | OpenMIS",
     description:
       "Client-side spreadsheet intelligence with zero cloud telemetry, deterministic math, and customizable executive dashboards.",
-    url: "https://openmis.dev/features",
+    url: `${BRAND.url}/features`,
   },
 };
 
 export default function FeaturesPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: BRAND.name,
-    operatingSystem: "Any (Web Browser)",
-    applicationCategory: "BusinessApplication",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Features", path: "/features" },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: BRAND.appName,
+      operatingSystem: "Any (Web Browser)",
+      applicationCategory: "BusinessApplication",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      featureList: [
+        "Client-Side CSV & XLSX Parsing",
+        "Automated Data Profiler and Type Inference",
+        "Reversible Data Cleaning with Undo/Redo",
+        "Deterministic Mathematical KPI Engine",
+        "Responsive ECharts Visualization Canvas",
+        "DDE Formula Injection Sanitization",
+        "Local IndexedDB Persistence",
+      ],
     },
-    featureList: [
-      "Client-Side CSV & XLSX Parsing",
-      "Automated Data Profiler and Type Inference",
-      "Reversible Data Cleaning with Undo/Redo",
-      "Deterministic Mathematical KPI Engine",
-      "Responsive ECharts Visualization Canvas",
-      "DDE Formula Injection Sanitization",
-      "Local IndexedDB Persistence",
-    ],
-  };
+  ];
 
   const featureBlocks = [
     {

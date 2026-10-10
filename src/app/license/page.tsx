@@ -4,11 +4,15 @@ import { MarketingHeader } from "@/components/layout/MarketingHeader";
 import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/Card";
 
+import { BRAND } from "@/lib/constants/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "MIT License & Third-Party Notices | OpenMIS",
   description: "Official MIT License text and open-source third-party software attributions for OpenMIS.",
   alternates: {
-    canonical: "https://openmis.dev/license",
+    canonical: `${BRAND.url}/license`,
   },
 };
 
@@ -23,8 +27,14 @@ export default function LicensePage() {
     { name: "Zod", license: "MIT License", purpose: "TypeScript-first schema validation" },
   ];
 
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "License & Notices", path: "/license" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

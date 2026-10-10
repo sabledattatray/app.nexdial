@@ -20,19 +20,21 @@ import {
 } from "lucide-react";
 import { MIS_TEMPLATES } from "@/lib/templates/template-registry";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { BRAND } from "@/lib/constants/brand";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "MIS Dashboard Templates & Excel Starters | OpenMIS",
   description:
     "Free production-ready MIS dashboard templates for Sales, Finance, Inventory, HR, Operations, Marketing, and Project tracking. 100% browser-side with synthetic sample data.",
   alternates: {
-    canonical: "https://openmis.dev/templates",
+    canonical: `${BRAND.url}/templates`,
   },
   openGraph: {
     title: "Free MIS Dashboard Templates | OpenMIS",
     description:
       "Explore 7 ready-to-use business MIS templates with synthetic datasets. Launch directly into the workspace with ₹0 cost and zero cloud uploads.",
-    url: "https://openmis.dev/templates",
+    url: `${BRAND.url}/templates`,
   },
 };
 
@@ -47,19 +49,27 @@ const TEMPLATE_ICONS: Record<string, React.ElementType> = {
 };
 
 export default function PublicTemplatesPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "OpenMIS Dashboard Templates",
-    description: "Production MIS templates for Excel and CSV datasets.",
-    url: "https://openmis.dev/templates",
-    hasPart: MIS_TEMPLATES.map((t) => ({
-      "@type": "SoftwareApplication",
-      name: t.name,
-      description: t.description,
-      applicationCategory: "BusinessApplication",
-    })),
-  };
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "MIS Templates", path: "/templates" },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "OpenMIS Dashboard Templates",
+      description: "Production MIS templates for Excel and CSV datasets.",
+      url: `${BRAND.url}/templates`,
+      hasPart: MIS_TEMPLATES.map((t) => ({
+        "@type": "SoftwareApplication",
+        name: t.name,
+        description: t.description,
+        applicationCategory: "BusinessApplication",
+      })),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

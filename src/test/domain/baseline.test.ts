@@ -4,6 +4,8 @@ import { BRAND } from "@/lib/constants/brand";
 describe("OpenMIS Baseline Foundation Tests", () => {
   it("should have valid centralized brand constants", () => {
     expect(BRAND.name).toBe("OpenMIS");
+    expect(BRAND.domain).toBe("app.nexdial.io");
+    expect(BRAND.url).toBe("https://app.nexdial.io");
     expect(BRAND.tagline).toBeDefined();
     expect(BRAND.limits.maxFileSizeMb).toBe(50);
     expect(BRAND.limits.maxRecommendedRows).toBe(100000);

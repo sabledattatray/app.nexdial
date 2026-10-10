@@ -8,18 +8,27 @@ import { Button } from "@/components/ui/Button";
 import { Heart, ShieldCheck, Sparkles, Code2, Users } from "lucide-react";
 import { BRAND } from "@/lib/constants/brand";
 
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "About OpenMIS | Mission & ₹0 Budget Philosophy",
   description:
     "Why OpenMIS was created: A free, privacy-first business intelligence and MIS dashboard tool built for Excel users, analysts, and small businesses.",
   alternates: {
-    canonical: "https://openmis.dev/about",
+    canonical: `${BRAND.url}/about`,
   },
 };
 
 export default function AboutPage() {
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

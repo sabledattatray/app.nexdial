@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { BRAND } from "@/lib/constants/brand";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://openmis.dev";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || BRAND.url;
 
   return {
     rules: [

@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/Button";
 import { HelpCircle, ArrowRight, Sparkles } from "lucide-react";
 import { JsonLd } from "@/components/seo/JsonLd";
 
+import { BRAND } from "@/lib/constants/brand";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Frequently Asked Questions (FAQ) | OpenMIS",
   description:
     "Honest answers about OpenMIS pricing (₹0 forever), client-side privacy, file size limits, Power BI differences, and deterministic calculations.",
   alternates: {
-    canonical: "https://openmis.dev/faq",
+    canonical: `${BRAND.url}/faq`,
   },
 };
 
@@ -69,18 +72,26 @@ const FAQ_ITEMS = [
 ];
 
 export default function FAQPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.a,
-      },
-    })),
-  };
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "FAQ", path: "/faq" },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: FAQ_ITEMS.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.a,
+        },
+      })),
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

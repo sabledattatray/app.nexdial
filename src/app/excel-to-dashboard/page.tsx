@@ -15,34 +15,30 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Free Excel to Dashboard Generator | OpenMIS",
   description:
     "Convert Excel spreadsheets (.xlsx, .xls) into interactive business dashboards in minutes. 100% browser-side, zero cloud uploads, and ₹0 budget required.",
   alternates: {
-    canonical: "https://openmis.dev/excel-to-dashboard",
+    canonical: `${BRAND.url}/excel-to-dashboard`,
   },
   openGraph: {
     title: "Free Excel to Dashboard Generator | OpenMIS",
     description:
       "Turn your Excel workbooks into executive MIS dashboards without Power BI or cloud subscriptions. 100% private and runs locally.",
-    url: "https://openmis.dev/excel-to-dashboard",
+    url: `${BRAND.url}/excel-to-dashboard`,
   },
 };
 
 export default function ExcelToDashboardPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS Excel to Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Convert Excel workbooks into executive dashboards inside the browser.",
-  };
-
   const faqs = [
     {
       q: "Does OpenMIS support multi-sheet Excel files?",
@@ -57,6 +53,21 @@ export default function ExcelToDashboardPage() {
       a: "Files up to 50MB are supported. Because all parsing happens in your browser RAM, workbooks up to 100,000 rows yield the smoothest interactive responsiveness.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Excel to Dashboard", path: "/excel-to-dashboard" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS Excel to Dashboard Generator",
+    description: "Convert Excel workbooks into executive dashboards inside the browser.",
+    path: "/excel-to-dashboard",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

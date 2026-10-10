@@ -14,34 +14,30 @@ import {
   ArrowRight,
   HelpCircle,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Finance & Expense MIS Dashboard Generator | OpenMIS",
   description:
     "Generate private finance, OPEX, and budget variance dashboards from Excel ledgers. Analyze cost centers, spending trends, and variance without cloud leaks.",
   alternates: {
-    canonical: "https://openmis.dev/finance-mis-dashboard",
+    canonical: `${BRAND.url}/finance-mis-dashboard`,
   },
   openGraph: {
     title: "Finance & Expense MIS Dashboard Generator | OpenMIS",
     description:
       "Transform corporate financial ledgers into executive expense summaries. 100% private, free, and open source.",
-    url: "https://openmis.dev/finance-mis-dashboard",
+    url: `${BRAND.url}/finance-mis-dashboard`,
   },
 };
 
 export default function FinanceMISDashboardPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS Finance Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Generate executive expense and budget variance dashboards from Excel ledgers.",
-  };
-
   const faqs = [
     {
       q: "How does OpenMIS calculate budget variance?",
@@ -56,6 +52,21 @@ export default function FinanceMISDashboardPage() {
       a: "Yes. OpenMIS includes a built-in Finance & Expense Summary MIS template loaded with realistic synthetic department expense lines.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Finance MIS Dashboard", path: "/finance-mis-dashboard" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS Finance Dashboard Generator",
+    description: "Generate executive expense and budget variance dashboards from Excel ledgers.",
+    path: "/finance-mis-dashboard",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

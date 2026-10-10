@@ -4,17 +4,27 @@ import { Metadata } from "next";
 import { MarketingHeader } from "@/components/layout/MarketingHeader";
 import { Footer } from "@/components/layout/Footer";
 
+import { BRAND } from "@/lib/constants/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Terms of Use | OpenMIS",
   description: "Terms of service and software disclaimers for OpenMIS open-source platform.",
   alternates: {
-    canonical: "https://openmis.dev/terms",
+    canonical: `${BRAND.url}/terms`,
   },
 };
 
 export default function TermsPage() {
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Terms of Use", path: "/terms" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

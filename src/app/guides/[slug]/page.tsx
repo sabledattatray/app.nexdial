@@ -33,6 +33,9 @@ export async function generateStaticParams() {
   }));
 }
 
+import { BRAND } from "@/lib/constants/brand";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export async function generateMetadata({ params }: GuidePageProps): Promise<Metadata> {
   const { slug } = await params;
   const guide = EDUCATIONAL_GUIDES[slug];
@@ -47,11 +50,12 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
     title: `${guide.title} | OpenMIS Guide`,
     description: guide.description,
     alternates: {
-      canonical: `https://openmis.dev/guides/${guide.slug}`,
+      canonical: `${BRAND.url}/guides/${guide.slug}`,
     },
     openGraph: {
       title: `${guide.title} | OpenMIS Guide`,
       description: guide.description,
+      url: `${BRAND.url}/guides/${guide.slug}`,
       type: "article",
       publishedTime: "2026-10-10T00:00:00.000Z",
       authors: [guide.author],
@@ -67,26 +71,36 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
     notFound();
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: guide.title,
-    description: guide.description,
-    author: {
-      "@type": "Organization",
-      name: guide.author,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "OpenMIS",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://openmis.dev/favicon.ico",
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Educational Guides", path: "/guides" },
+    { name: guide.title, path: `/guides/${guide.slug}` },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      headline: guide.title,
+      description: guide.description,
+      author: {
+        "@type": "Organization",
+        name: guide.author,
       },
+      publisher: {
+        "@type": "Organization",
+        name: BRAND.appName,
+        url: BRAND.url,
+        logo: {
+          "@type": "ImageObject",
+          url: `${BRAND.url}/favicon.ico`,
+        },
+      },
+      datePublished: "2026-10-10",
+      mainEntityOfPage: `${BRAND.url}/guides/${guide.slug}`,
     },
-    datePublished: "2026-10-10",
-    mainEntityOfPage: `https://openmis.dev/guides/${guide.slug}`,
-  };
+  ];
 
   const relatedGuides = guide.relatedSlugs
     .map((s) => EDUCATIONAL_GUIDES[s])

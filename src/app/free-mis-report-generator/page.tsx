@@ -15,34 +15,30 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Free MIS Report Generator & Dashboard Builder | OpenMIS",
   description:
     "Generate executive Management Information System (MIS) reports from spreadsheets. Print-ready boardroom PDF exports, KPI rollups, and zero software licensing cost.",
   alternates: {
-    canonical: "https://openmis.dev/free-mis-report-generator",
+    canonical: `${BRAND.url}/free-mis-report-generator`,
   },
   openGraph: {
     title: "Free MIS Report Generator | OpenMIS",
     description:
       "Automate monthly and weekly MIS reports without expensive corporate BI licenses. 100% private, free, and open source.",
-    url: "https://openmis.dev/free-mis-report-generator",
+    url: `${BRAND.url}/free-mis-report-generator`,
   },
 };
 
 export default function FreeMISReportGeneratorPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS Free MIS Report Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Executive MIS report and summary builder running client-side in the browser.",
-  };
-
   const faqs = [
     {
       q: "What makes OpenMIS ideal for MIS executives?",
@@ -57,6 +53,21 @@ export default function FreeMISReportGeneratorPage() {
       a: "Yes. Save your configured report layout in local IndexedDB or export it as a JSON file. Next week, load your new spreadsheet and apply the saved report definition in 1 click.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Free MIS Report Generator", path: "/free-mis-report-generator" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS Free MIS Report Generator",
+    description: "Executive MIS report and summary builder running client-side in the browser.",
+    path: "/free-mis-report-generator",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

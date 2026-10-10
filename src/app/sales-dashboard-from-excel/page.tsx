@@ -14,34 +14,30 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Create Sales Dashboards from Excel Spreadsheets | OpenMIS",
   description:
     "Generate interactive sales performance dashboards from Excel and CSV files. Track MoM revenue growth, gross margins, regional splits, and top customer concentrations.",
   alternates: {
-    canonical: "https://openmis.dev/sales-dashboard-from-excel",
+    canonical: `${BRAND.url}/sales-dashboard-from-excel`,
   },
   openGraph: {
     title: "Create Sales Dashboards from Excel | OpenMIS",
     description:
       "Transform Excel sales sheets into executive revenue and margin dashboards in minutes. 100% free and private.",
-    url: "https://openmis.dev/sales-dashboard-from-excel",
+    url: `${BRAND.url}/sales-dashboard-from-excel`,
   },
 };
 
 export default function SalesDashboardFromExcelPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS Sales Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Generate interactive sales performance dashboards from Excel spreadsheets.",
-  };
-
   const faqs = [
     {
       q: "How does OpenMIS calculate Month-over-Month (MoM) sales growth?",
@@ -56,6 +52,21 @@ export default function SalesDashboardFromExcelPage() {
       a: "Yes. OpenMIS includes a built-in Sales MIS template loaded with synthetic transactional data so you can test the builder before uploading your own files.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Sales Dashboard from Excel", path: "/sales-dashboard-from-excel" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS Sales Dashboard Generator",
+    description: "Generate interactive sales performance dashboards from Excel spreadsheets.",
+    path: "/sales-dashboard-from-excel",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

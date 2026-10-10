@@ -6,12 +6,16 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { GitCommit, CheckCircle2 } from "lucide-react";
 
+import { BRAND } from "@/lib/constants/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Changelog & Product Releases | OpenMIS",
   description:
     "Track updates, features, improvements, and releases for the OpenMIS client-side dashboard builder.",
   alternates: {
-    canonical: "https://openmis.dev/changelog",
+    canonical: `${BRAND.url}/changelog`,
   },
 };
 
@@ -39,8 +43,14 @@ const RELEASES = [
 ];
 
 export default function ChangelogPage() {
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Changelog", path: "/changelog" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

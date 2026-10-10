@@ -5,18 +5,28 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/Card";
 import { ShieldCheck, Lock, AlertTriangle, FileCode, Cpu } from "lucide-react";
 
+import { BRAND } from "@/lib/constants/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Security Architecture & Vulnerability Policy | OpenMIS",
   description:
     "OpenMIS security posture: Dynamic Data Exchange (DDE) formula injection sanitization, client-side browser isolation, and responsible disclosure policy.",
   alternates: {
-    canonical: "https://openmis.dev/security",
+    canonical: `${BRAND.url}/security`,
   },
 };
 
 export default function SecurityPage() {
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Security Architecture", path: "/security" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

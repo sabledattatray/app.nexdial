@@ -14,34 +14,30 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Inventory Dashboard Template & Stock Tracker | OpenMIS",
   description:
     "Free inventory dashboard generator from spreadsheets. Monitor SKU stock levels, warehouse valuation, reorder thresholds, and out-of-stock risks locally.",
   alternates: {
-    canonical: "https://openmis.dev/inventory-dashboard-template",
+    canonical: `${BRAND.url}/inventory-dashboard-template`,
   },
   openGraph: {
     title: "Inventory Dashboard Template | OpenMIS",
     description:
       "Turn your inventory and stock spreadsheets into real-time executive dashboards with ₹0 cost and zero cloud uploads.",
-    url: "https://openmis.dev/inventory-dashboard-template",
+    url: `${BRAND.url}/inventory-dashboard-template`,
   },
 };
 
 export default function InventoryDashboardTemplatePage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS Inventory Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Generate interactive stock and inventory dashboards from Excel spreadsheets.",
-  };
-
   const faqs = [
     {
       q: "Can OpenMIS flag low stock and reorder thresholds?",
@@ -56,6 +52,21 @@ export default function InventoryDashboardTemplatePage() {
       a: "Yes. OpenMIS includes a built-in Inventory & Stock Status MIS template with realistic synthetic SKU records.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Inventory Dashboard Template", path: "/inventory-dashboard-template" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS Inventory Dashboard Generator",
+    description: "Generate interactive stock and inventory dashboards from Excel spreadsheets.",
+    path: "/inventory-dashboard-template",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

@@ -6,18 +6,28 @@ import { Footer } from "@/components/layout/Footer";
 import { Card } from "@/components/ui/Card";
 import { ShieldCheck, CheckCircle2, EyeOff } from "lucide-react";
 
+import { BRAND } from "@/lib/constants/brand";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "Privacy Policy & Zero-Telemetry Model | OpenMIS",
   description:
     "OpenMIS privacy architecture: 100% client-side data processing, zero telemetry of spreadsheet content, and complete local IndexedDB persistence.",
   alternates: {
-    canonical: "https://openmis.dev/privacy",
+    canonical: `${BRAND.url}/privacy`,
   },
 };
 
 export default function PrivacyPage() {
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Privacy Policy", path: "/privacy" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbLd} />
       <MarketingHeader />
 
       <main className="flex-1 py-16 sm:py-20">

@@ -14,34 +14,30 @@ import {
   ArrowRight,
   HelpCircle,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "HR MIS Dashboard & Headcount Analytics | OpenMIS",
   description:
     "Generate private HR MIS dashboards from employee rosters and payroll spreadsheets. Analyze headcount, department tenure, attendance, and turnover locally.",
   alternates: {
-    canonical: "https://openmis.dev/hr-mis-dashboard",
+    canonical: `${BRAND.url}/hr-mis-dashboard`,
   },
   openGraph: {
     title: "HR MIS Dashboard & Headcount Analytics | OpenMIS",
     description:
       "A 100% private, browser-first HR analytics dashboard. Employee records and compensation data never leave your computer.",
-    url: "https://openmis.dev/hr-mis-dashboard",
+    url: `${BRAND.url}/hr-mis-dashboard`,
   },
 };
 
 export default function HRMISDashboardPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS HR Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Generate private HR headcount and attendance dashboards from spreadsheets.",
-  };
-
   const faqs = [
     {
       q: "Is it safe to upload confidential payroll and employee data?",
@@ -56,6 +52,21 @@ export default function HRMISDashboardPage() {
       a: "Yes. OpenMIS includes a ready-to-use HR, Headcount & Attendance template loaded with synthetic personnel records.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "HR MIS Dashboard", path: "/hr-mis-dashboard" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS HR Dashboard Generator",
+    description: "Generate private HR headcount and attendance dashboards from spreadsheets.",
+    path: "/hr-mis-dashboard",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

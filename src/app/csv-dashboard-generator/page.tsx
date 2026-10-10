@@ -14,34 +14,30 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
+import { BRAND } from "@/lib/constants/brand";
 import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildSoftwareAppSchema,
+} from "@/lib/seo/schema-builders";
 
 export const metadata: Metadata = {
   title: "Instant CSV Dashboard Generator | OpenMIS",
   description:
     "Generate business dashboards from CSV files in seconds. Automatic delimiter detection, data profiling, deterministic metrics, and anti-formula injection export protection.",
   alternates: {
-    canonical: "https://openmis.dev/csv-dashboard-generator",
+    canonical: `${BRAND.url}/csv-dashboard-generator`,
   },
   openGraph: {
     title: "Instant CSV Dashboard Generator | OpenMIS",
     description:
       "Transform plain CSV exports into executive dashboards right in your browser. 100% private, free, and open source.",
-    url: "https://openmis.dev/csv-dashboard-generator",
+    url: `${BRAND.url}/csv-dashboard-generator`,
   },
 };
 
 export default function CSVDashboardGeneratorPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "OpenMIS CSV Dashboard Generator",
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web Browser",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description: "Generate executive dashboards from CSV exports inside the browser.",
-  };
-
   const faqs = [
     {
       q: "Does OpenMIS handle different CSV delimiters?",
@@ -56,6 +52,21 @@ export default function CSVDashboardGeneratorPage() {
       a: "Yes. When you export or clean CSV files, OpenMIS inspects every cell string and prepends an apostrophe (') to any cell starting with =, +, -, @, \\t, or \\r, neutralizing spreadsheet execution risks.",
     },
   ];
+
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "CSV Dashboard Generator", path: "/csv-dashboard-generator" },
+  ]);
+
+  const faqLd = buildFaqSchema(faqs);
+
+  const softwareLd = buildSoftwareAppSchema({
+    name: "OpenMIS CSV Dashboard Generator",
+    description: "Generate executive dashboards from CSV exports inside the browser.",
+    path: "/csv-dashboard-generator",
+  });
+
+  const jsonLd = [breadcrumbLd, faqLd, softwareLd];
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">

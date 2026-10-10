@@ -67,6 +67,10 @@ describe("Phase 7: SEO, Educational Guides & Metadata", () => {
     expect(urls.some((u) => u.endsWith("/security"))).toBe(true);
     expect(urls.some((u) => u.endsWith("/faq"))).toBe(true);
 
+    // Verify domain is app.nexdial.io
+    expect(urls[0]).toMatch(/^https:\/\/app\.nexdial\.io/);
+    expect(urls.every((u) => u.startsWith("https://app.nexdial.io"))).toBe(true);
+
     // CRITICAL: Ensure private app workspace routes are NOT in the public sitemap
     expect(urls.some((u) => u.includes("/app/"))).toBe(false);
 
@@ -84,6 +88,45 @@ describe("Phase 7: SEO, Educational Guides & Metadata", () => {
     const rule = Array.isArray(r.rules) ? r.rules[0] : r.rules;
     expect(rule.allow).toBe("/");
     expect(rule.disallow).toContain("/app/");
-    expect(r.sitemap).toContain("sitemap.xml");
+    expect(r.sitemap).toBe("https://app.nexdial.io/sitemap.xml");
+  });
+
+  it("builds valid Breadcrumb, FAQ, and SoftwareApplication schemas", async () => {
+    const {
+      buildBreadcrumbSchema,
+      buildFaqSchema,
+      buildSoftwareAppSchema,
+      buildArticleSchema,
+    } = await import("@/lib/seo/schema-builders");
+
+    const breadcrumbs = buildBreadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Guides", path: "/guides" },
+    ]);
+    expect(breadcrumbs["@type"]).toBe("BreadcrumbList");
+    expect(breadcrumbs.itemListElement).toHaveLength(2);
+    expect(breadcrumbs.itemListElement[0].item).toBe("https://app.nexdial.io/");
+    expect(breadcrumbs.itemListElement[1].item).toBe("https://app.nexdial.io/guides");
+
+    const faqs = buildFaqSchema([
+      { q: "Is it free?", a: "Yes, 100% free." },
+    ]);
+    expect(faqs["@type"]).toBe("FAQPage");
+    expect(faqs.mainEntity).toHaveLength(1);
+    expect(faqs.mainEntity[0].name).toBe("Is it free?");
+
+    const app = buildSoftwareAppSchema();
+    expect(app["@type"]).toBe("SoftwareApplication");
+    expect(app.url).toBe("https://app.nexdial.io");
+    expect(app.offers.price).toBe("0");
+
+    const article = buildArticleSchema({
+      title: "How to clean data",
+      description: "Step by step data cleaning guide",
+      slug: "clean-excel-data",
+      author: "OpenMIS Team",
+    });
+    expect(article["@type"]).toBe("TechArticle");
+    expect(article.mainEntityOfPage).toBe("https://app.nexdial.io/guides/clean-excel-data");
   });
 });

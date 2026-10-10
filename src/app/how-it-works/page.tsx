@@ -16,26 +16,36 @@ import {
 } from "lucide-react";
 import { JsonLd } from "@/components/seo/JsonLd";
 
+import { BRAND } from "@/lib/constants/brand";
+import { buildBreadcrumbSchema } from "@/lib/seo/schema-builders";
+
 export const metadata: Metadata = {
   title: "How It Works | OpenMIS Architecture & Workflow",
   description:
     "Learn how OpenMIS parses spreadsheets, computes deterministic metrics, and renders executive MIS dashboards 100% inside your browser.",
   alternates: {
-    canonical: "https://openmis.dev/how-it-works",
+    canonical: `${BRAND.url}/how-it-works`,
   },
   openGraph: {
     title: "How OpenMIS Works | Client-Side Architecture",
     description:
       "A step-by-step walkthrough of how OpenMIS transforms messy spreadsheets into interactive dashboards without sending a single byte to the cloud.",
-    url: "https://openmis.dev/how-it-works",
+    url: `${BRAND.url}/how-it-works`,
   },
 };
 
 export default function HowItWorksPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to Build an MIS Dashboard from an Excel Spreadsheet in OpenMIS",
+  const breadcrumbLd = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "How It Works", path: "/how-it-works" },
+  ]);
+
+  const jsonLd = [
+    breadcrumbLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: "How to Build an MIS Dashboard from an Excel Spreadsheet in OpenMIS",
     step: [
       {
         "@type": "HowToStep",
@@ -68,7 +78,8 @@ export default function HowItWorksPage() {
         text: "Download sanitized CSV/XLSX files immune to formula injection, print executive PDFs, or save to browser IndexedDB.",
       },
     ],
-  };
+  },
+];
 
   const steps = [
     {
