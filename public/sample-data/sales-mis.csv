@@ -1,0 +1,24 @@
+Date,Sales_Rep,Region,Category,Revenue,Units_Sold
+2026-01-05,Ananya Sharma,North,Enterprise,12450.00,8
+2026-01-08,Rajesh Patel,West,Mid-Market,8200.50,14
+2026-01-12,Priya Nair,South,SMB,4150.00,22
+2026-01-15,Vikram Singh,East,Enterprise,18900.00,12
+2026-01-18,Ananya Sharma,North,Mid-Market,7600.00,10
+2026-01-22,Sneha Kulkarni,Central,SMB,3890.00,19
+2026-01-25,Rajesh Patel,West,Enterprise,14500.00,9
+2026-01-29,Priya Nair,South,Mid-Market,6200.00,11
+2026-02-02,Vikram Singh,East,SMB,2950.00,15
+2026-02-06,Ananya Sharma,North,Enterprise,21000.00,14
+2026-02-10,Sneha Kulkarni,Central,Enterprise,11500.00,7
+2026-02-14,Rajesh Patel,West,Mid-Market,9400.00,16
+2026-02-18,Priya Nair,South,SMB,5100.00,25
+2026-02-22,Vikram Singh,East,Enterprise,16800.00,11
+2026-02-26,Sneha Kulkarni,Central,Mid-Market,8300.00,13
+2026-03-02,Ananya Sharma,North,SMB,4600.00,20
+2026-03-06,Rajesh Patel,West,Enterprise,23500.00,15
+2026-03-10,Priya Nair,South,Enterprise,17200.00,10
+2026-03-14,Vikram Singh,East,Mid-Market,10200.00,18
+2026-03-18,Sneha Kulkarni,Central,SMB,3400.00,17
+2026-03-22,Ananya Sharma,North,Mid-Market,9100.00,12
+2026-03-26,Rajesh Patel,West,SMB,4800.00,24
+2026-03-30,Priya Nair,South,Mid-Market,7900.00,13

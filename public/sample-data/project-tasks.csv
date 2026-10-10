@@ -1,0 +1,13 @@
+Task_ID,Project_Name,Assignee,Status,Priority,Estimated_Hours
+TSK-101,Core Dashboard Engine,Amit Kumar,Done,High,40
+TSK-102,Excel Workbook Parser,Neha Gupta,Done,High,32
+TSK-103,Data Profiler Engine,Amit Kumar,Done,Medium,24
+TSK-104,Formula Injection Defense,Vikram Rao,Done,Critical,16
+TSK-105,Virtual Table Rendering,Neha Gupta,In Progress,High,28
+TSK-106,PDF Print Exporter,Vikram Rao,In Progress,Medium,20
+TSK-107,Template Gallery UI,Sneha Roy,Done,Low,12
+TSK-108,WCAG Keyboard Nav,Sneha Roy,In Progress,High,18
+TSK-109,Outlier Detection IQR,Amit Kumar,To Do,Medium,16
+TSK-110,Dark Theme Token Polish,Sneha Roy,Done,Low,8
+TSK-111,E2E Workflow Test Suite,Vikram Rao,To Do,High,30
+TSK-112,IndexedDB Auto-Save,Neha Gupta,Done,Medium,14

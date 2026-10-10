@@ -1,0 +1,13 @@
+SKU,Item_Name,Warehouse,Current_Stock,Reorder_Level,Unit_Cost
+SKU-1001,Ergonomic Office Chair,North Hub,142,50,85.00
+SKU-1002,Standing Desk Pro,West Hub,38,40,240.00
+SKU-1003,USB-C Docking Station,North Hub,215,60,45.00
+SKU-1004,Mechanical Keyboard,East Hub,85,50,55.00
+SKU-1005,27-inch 4K Monitor,South Hub,24,30,195.00
+SKU-1006,Noise-Canceling Headset,West Hub,110,40,72.00
+SKU-1007,Wireless Vertical Mouse,East Hub,310,75,28.50
+SKU-1008,Desk LED Lamp,Central Hub,64,30,22.00
+SKU-1009,Laptop Aluminum Stand,North Hub,190,50,18.00
+SKU-1010,Cat6 Ethernet Cable 10m,South Hub,420,100,6.50
+SKU-1011,Monitor Arm Dual,Central Hub,18,25,65.00
+SKU-1012,Power Strip 8-Outlet,West Hub,180,60,14.00

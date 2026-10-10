@@ -1,0 +1,13 @@
+Ticket_ID,Created_Date,Priority,Resolution_Hours,SLA_Status,Agent
+TCK-8001,2026-03-01,High,2.4,Met,Rahul Mehra
+TCK-8002,2026-03-01,Critical,1.1,Met,Sneha Roy
+TCK-8003,2026-03-02,Medium,8.5,Met,Rahul Mehra
+TCK-8004,2026-03-02,Low,26.0,Breached,Karan Verma
+TCK-8005,2026-03-03,High,5.2,Breached,Sneha Roy
+TCK-8006,2026-03-03,Critical,0.8,Met,Rahul Mehra
+TCK-8007,2026-03-04,Medium,6.1,Met,Karan Verma
+TCK-8008,2026-03-04,High,3.3,Met,Sneha Roy
+TCK-8009,2026-03-05,Low,18.0,Met,Karan Verma
+TCK-8010,2026-03-05,Critical,1.4,Met,Rahul Mehra
+TCK-8011,2026-03-06,Medium,9.8,Breached,Sneha Roy
+TCK-8012,2026-03-06,High,2.8,Met,Karan Verma

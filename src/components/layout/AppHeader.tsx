@@ -15,6 +15,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { useDataset } from "@/context/DatasetContext";
+
 interface AppHeaderProps {
   datasetName?: string;
   rowCount?: number;
@@ -38,7 +40,18 @@ const getThemeSnapshot = () => {
 
 const getServerSnapshot = () => false;
 
-export function AppHeader({ datasetName, rowCount }: AppHeaderProps) {
+export function AppHeader({ datasetName: propName, rowCount: propRows }: AppHeaderProps) {
+  let contextProfile = null;
+  try {
+    const ctx = useDataset();
+    contextProfile = ctx.profile;
+  } catch {
+    // Context may not be mounted outside /app
+  }
+
+  const activeDatasetName = propName || contextProfile?.metadata.name;
+  const activeRowCount = propRows || contextProfile?.metadata.rowCount;
+
   const isDark = useSyncExternalStore(
     subscribeToTheme,
     getThemeSnapshot,
@@ -66,10 +79,10 @@ export function AppHeader({ datasetName, rowCount }: AppHeaderProps) {
         {/* Dataset Status Indicator */}
         <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
         <div className="flex items-center gap-2">
-          {datasetName ? (
+          {activeDatasetName ? (
             <Badge variant="success" className="gap-1 px-2.5 py-1 text-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {datasetName} {rowCount ? `(${rowCount.toLocaleString()} rows)` : ""}
+              {activeDatasetName} {activeRowCount ? `(${activeRowCount.toLocaleString()} rows)` : ""}
             </Badge>
           ) : (
             <Badge variant="secondary" className="gap-1 px-2.5 py-1 text-xs">

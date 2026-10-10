@@ -1,0 +1,13 @@
+Employee_ID,Department,Role,Join_Date,Attendance_Pct,Overtime_Hours
+EMP-001,Engineering,Staff Engineer,2022-03-15,98.5,12.5
+EMP-002,Product,Product Manager,2023-01-10,95.0,6.0
+EMP-003,Sales,Account Executive,2023-06-01,92.5,18.0
+EMP-004,Marketing,Content Strategist,2022-11-20,96.0,4.5
+EMP-005,Customer Support,Support Lead,2021-08-14,99.0,24.0
+EMP-006,Engineering,Frontend Engineer,2024-02-01,94.0,8.0
+EMP-007,Engineering,Backend Engineer,2023-09-12,97.5,14.0
+EMP-008,Operations,Logistics Coordinator,2022-05-18,91.0,22.0
+EMP-009,Finance,Financial Analyst,2023-04-05,98.0,10.0
+EMP-010,Design,UI/UX Designer,2024-01-15,93.5,5.0
+EMP-011,Sales,BDR Specialist,2024-03-01,90.5,16.5
+EMP-012,HR,People Ops Specialist,2022-10-08,97.0,2.0

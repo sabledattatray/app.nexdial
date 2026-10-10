@@ -1,0 +1,16 @@
+Date,Department,Vendor,Category,Actual_Spend,Budget_Allocated
+2026-01-05,Engineering,AWS Cloud Services,Infrastructure,14200.00,15000.00
+2026-01-10,Marketing,Google Ads,Advertising,8500.00,9000.00
+2026-01-15,Sales,Salesforce CRM,Software Licenses,6200.00,6000.00
+2026-01-20,HR,Workday HRIS,Software Licenses,4500.00,4500.00
+2026-01-25,Operations,WeWork Offices,Facilities,12000.00,12000.00
+2026-02-05,Engineering,Datadog APM,Infrastructure,3800.00,3500.00
+2026-02-10,Marketing,LinkedIn Ads,Advertising,5200.00,5000.00
+2026-02-15,Finance,Stripe Processing,Payment Gateway,2900.00,3200.00
+2026-02-20,Legal,Baker & McKenzie,Legal Advisory,9400.00,8000.00
+2026-02-25,Operations,FedEx Express,Logistics,1850.00,2000.00
+2026-03-05,Engineering,GitHub Enterprise,Developer Tools,4100.00,4100.00
+2026-03-10,Marketing,Meta Advertising,Advertising,7800.00,7500.00
+2026-03-15,HR,Aon Hewitt,Employee Benefits,8900.00,9000.00
+2026-03-20,Operations,Zoom Video,Communications,1250.00,1500.00
+2026-03-25,Engineering,MongoDB Atlas,Database Hosting,6400.00,6000.00
