@@ -41,9 +41,12 @@ export const metadata: Metadata = {
     "finance MIS dashboard",
     "zero cloud spreadsheet analytics",
   ],
-  authors: [{ name: "Nexdial", url: BRAND.url }],
-  creator: BRAND.appName,
-  publisher: BRAND.orgName,
+  authors: [
+    { name: "Datta Sable", url: "https://dattasable.com" },
+    { name: "Nexdial", url: BRAND.url },
+  ],
+  creator: "Datta Sable",
+  publisher: "Datta Sable / Nexdial",
   applicationName: BRAND.appName,
   alternates: {
     canonical: "/",
@@ -114,6 +117,11 @@ const rootStructuredData = [
     applicationSubCategory: "Business Intelligence, MIS Reporting & Excel Analytics",
     operatingSystem: "All Modern Web Browsers (Chrome, Firefox, Safari, Edge)",
     url: BRAND.url,
+    author: {
+      "@type": "Person",
+      name: "Datta Sable",
+      url: "https://dattasable.com",
+    },
     offers: {
       "@type": "Offer",
       price: "0",
