@@ -53,15 +53,17 @@ import {
   Layers,
 } from "lucide-react";
 import { TemplateSwitcherBar } from "@/components/templates/TemplateSwitcherBar";
-import { MISTemplate } from "@/lib/templates/template-registry";
+import { TemplateSlideOverDrawer } from "@/components/templates/TemplateSlideOverDrawer";
+import { MIS_TEMPLATES, MISTemplate } from "@/lib/templates/template-registry";
 import { parseCsvString } from "@/lib/parsers/csv-parser";
 import { profileDataset } from "@/domain/dataset/profiler";
 
 export default function ReportDashboardPage() {
   const { profile, rows, isLoading, setLoadedDataset } = useDataset();
 
-  // Template Shelf & Active Selection State
-  const [templateShelfOpen, setTemplateShelfOpen] = useState(false);
+  // Template Drawer, Shelf & Active Selection State
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [templateShelfOpen, setTemplateShelfOpen] = useState(true);
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
 
@@ -287,8 +289,12 @@ export default function ReportDashboardPage() {
     setCustomTitle(`${template.name} • ${profile.metadata.name}`);
     setActiveTemplateId(template.id);
     setHasUnsavedChanges(true);
-    setSaveSuccessMessage(`Applied "${template.name}" layout! Live report updated below.`);
+    setSaveSuccessMessage(`Applied "${template.name}" layout! Live report updated.`);
     setTimeout(() => setSaveSuccessMessage(null), 4000);
+    // Smoothly scroll back to report if applied from bottom shelf
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // Load a template's complete synthetic dataset into memory & render live report
@@ -339,6 +345,9 @@ export default function ReportDashboardPage() {
         `Loaded "${template.name}" (${parseResult.rows.length.toLocaleString()} rows). Live report ready!`
       );
       setTimeout(() => setSaveSuccessMessage(null), 4000);
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     } catch (err) {
       alert(`Error loading template: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -507,16 +516,6 @@ export default function ReportDashboardPage() {
         </div>
       )}
 
-      {/* Interactive MIS Template Gallery Shelf */}
-      <TemplateSwitcherBar
-        isOpen={templateShelfOpen}
-        onToggleOpen={() => setTemplateShelfOpen((v) => !v)}
-        onApplyTemplateLayout={handleApplyTemplateLayout}
-        onLoadTemplateData={handleLoadTemplateData}
-        loadingTemplateId={loadingTemplateId}
-        activeTemplateId={activeTemplateId}
-      />
-
       {/* Dedicated Executive Boardroom Print Header (Visible ONLY when printing) */}
       <div className="hidden print:block mb-6 pb-4 border-b-2 border-slate-900 break-inside-avoid">
         <div className="flex items-center justify-between">
@@ -628,14 +627,23 @@ export default function ReportDashboardPage() {
           <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0 max-w-full">
             <Button
               size="sm"
-              variant={templateShelfOpen ? "primary" : "accent"}
-              onClick={() => setTemplateShelfOpen((v) => !v)}
+              variant={drawerOpen ? "primary" : "accent"}
+              onClick={() => setDrawerOpen(true)}
               className="gap-1.5 shadow-xs"
-              title="Open MIS template gallery to live-preview or apply 22 production styles"
+              title="Open live MIS templates drawer to switch styles beside your report with zero scrolling"
             >
               <Layers className="w-3.5 h-3.5" />
               <span>MIS Templates (22)</span>
             </Button>
+
+            <a
+              href="#mis-templates-section"
+              className="hidden lg:inline-flex items-center gap-1 text-xs text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 font-medium px-2 py-1 transition-colors"
+              title="Jump to full template catalog behind report"
+            >
+              <span>Browse Behind</span>
+              <ChevronDown className="w-3 h-3" />
+            </a>
 
             <Button
               size="sm"
@@ -944,6 +952,80 @@ export default function ReportDashboardPage() {
           </div>
         )}
       </section>
+
+      {/* 6. Section Behind Generated Report: MIS Templates Library (PRD Section 18 & 22 Styles) */}
+      <section
+        id="mis-templates-section"
+        className="space-y-4 pt-8 border-t-2 border-slate-200 dark:border-slate-800 print:hidden"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                Templates Catalog
+              </span>
+              <Badge variant="accent" className="text-[10px] py-0 px-2 font-bold">
+                22 Styles Available
+              </Badge>
+              {activeTemplateId && (
+                <Badge variant="success" className="text-[10px] py-0 px-2 font-medium">
+                  Active: {MIS_TEMPLATES.find((t) => t.id === activeTemplateId)?.name}
+                </Badge>
+              )}
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight mt-0.5">
+              MIS Templates Library (Behind Generated Report)
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Browse all 22 domain-specific executive layouts below your active report. Click &ldquo;Apply Style&rdquo; to adapt your current dataset, or &ldquo;Load Data&rdquo; for realistic business data.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+              className="gap-1.5 text-xs"
+              title="Scroll back up to the top of your report"
+            >
+              <span>Back to Top of Report</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="accent"
+              onClick={() => setDrawerOpen(true)}
+              className="gap-1.5 text-xs shadow-xs"
+              title="Open side-drawer for live switching with zero scrolling"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Open Side Drawer</span>
+            </Button>
+          </div>
+        </div>
+
+        <TemplateSwitcherBar
+          isOpen={templateShelfOpen}
+          onToggleOpen={() => setTemplateShelfOpen((v) => !v)}
+          onApplyTemplateLayout={handleApplyTemplateLayout}
+          onLoadTemplateData={handleLoadTemplateData}
+          loadingTemplateId={loadingTemplateId}
+          activeTemplateId={activeTemplateId}
+        />
+      </section>
+
+      {/* Slide-Over Side Drawer for Live Preview Without Any Scrolling */}
+      <TemplateSlideOverDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onApplyTemplateLayout={handleApplyTemplateLayout}
+        onLoadTemplateData={handleLoadTemplateData}
+        loadingTemplateId={loadingTemplateId}
+        activeTemplateId={activeTemplateId}
+      />
 
       {/* Dedicated Executive Boardroom Print Footer (Visible ONLY when printing) */}
       <div className="hidden print:flex items-center justify-between pt-4 mt-8 border-t border-slate-300 text-[10px] text-slate-500 break-inside-avoid">
