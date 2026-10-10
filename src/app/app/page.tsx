@@ -7,7 +7,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import {
   UploadCloud,
   FileSpreadsheet,
-  FolderOpen,
   Sparkles,
   ShieldCheck,
   ArrowRight,
@@ -16,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { BRAND } from "@/lib/constants/brand";
+import { SavedReportsList } from "@/components/dashboard/SavedReportsList";
 
 export default function WorkspaceHome() {
   const featuredTemplates = [
@@ -126,13 +126,7 @@ export default function WorkspaceHome() {
                 Locally Saved Reports
               </h3>
             </div>
-            <Card className="p-6 text-center text-sm text-slate-500 dark:text-slate-400 border-dashed">
-              <FolderOpen className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-              <p>No reports saved in this browser yet.</p>
-              <p className="text-xs text-slate-400 mt-1">
-                Saved reports remain in your browser’s IndexedDB storage and are never uploaded to the cloud.
-              </p>
-            </Card>
+            <SavedReportsList />
           </div>
         </div>
 

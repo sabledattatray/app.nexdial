@@ -16,17 +16,36 @@ import {
   PieChart,
   Activity,
   Layers,
+  Edit2,
+  Copy,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import * as echarts from "echarts";
 
 interface WidgetCardProps {
   spec: ChartWidgetSpec;
   rows: RowData[];
+  onEdit?: (spec: ChartWidgetSpec) => void;
+  onDuplicate?: (spec: ChartWidgetSpec) => void;
+  onDelete?: (widgetId: string) => void;
+  onMoveUp?: (widgetId: string) => void;
+  onMoveDown?: (widgetId: string) => void;
 }
 
-export function WidgetCard({ spec, rows }: WidgetCardProps) {
+export function WidgetCard({
+  spec,
+  rows,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+}: WidgetCardProps) {
   const [showTable, setShowTable] = useState(false);
   const [whyModalOpen, setWhyModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   // 1. Process Chart Data from Rows
   const processedData = useMemo(() => {
@@ -260,13 +279,42 @@ export function WidgetCard({ spec, rows }: WidgetCardProps) {
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate max-w-[180px]">
             {spec.title}
           </p>
-          <button
-            onClick={() => setWhyModalOpen(true)}
-            className="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition-colors"
-            title="Formula definition"
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setWhyModalOpen(true)}
+              className="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition-colors"
+              title="Formula definition"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+            </button>
+            {onEdit && (
+              <button
+                onClick={() => onEdit(spec)}
+                className="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition-colors"
+                title="Edit KPI"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+            {onDuplicate && (
+              <button
+                onClick={() => onDuplicate(spec)}
+                className="text-slate-400 hover:text-indigo-600 p-0.5 rounded transition-colors"
+                title="Duplicate KPI"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => setDeleteModalOpen(true)}
+                className="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
+                title="Delete KPI"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="py-2">
@@ -297,6 +345,36 @@ export function WidgetCard({ spec, rows }: WidgetCardProps) {
             <p><strong>Evidence:</strong> {spec.whyThisChart}</p>
           </div>
         </Modal>
+
+        {/* Delete Confirmation Modal */}
+        <Modal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Delete KPI Card"
+          description="Are you sure you want to remove this widget from your dashboard?"
+          maxWidth="sm"
+        >
+          <div className="space-y-4 text-xs">
+            <p className="text-slate-600 dark:text-slate-300">
+              Removing &ldquo;{spec.title}&rdquo; will delete it from this view. You can re-add it anytime from the Add Widget button.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  onDelete?.(spec.id);
+                }}
+              >
+                Delete Widget
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </Card>
     );
   }
@@ -319,12 +397,62 @@ export function WidgetCard({ spec, rows }: WidgetCardProps) {
           </div>
         </div>
 
-        {/* Controls: Why this chart + Data Table toggle */}
-        <div className="flex items-center gap-1.5">
+        {/* Controls: Why this chart + Data Table toggle + Inspector actions */}
+        <div className="flex items-center gap-1">
           {spec.topN && (
-            <Badge variant="outline" className="text-[10px] hidden sm:inline-flex">
+            <Badge variant="outline" className="text-[10px] hidden sm:inline-flex mr-1">
               Top {spec.topN}
             </Badge>
+          )}
+
+          {onMoveUp && (
+            <button
+              onClick={() => onMoveUp(spec.id)}
+              className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              title="Move Earlier"
+            >
+              <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {onMoveDown && (
+            <button
+              onClick={() => onMoveDown(spec.id)}
+              className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              title="Move Later"
+            >
+              <ArrowDown className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {onEdit && (
+            <button
+              onClick={() => onEdit(spec)}
+              className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+              title="Edit Widget"
+            >
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {onDuplicate && (
+            <button
+              onClick={() => onDuplicate(spec)}
+              className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+              title="Duplicate Widget"
+            >
+              <Copy className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {onDelete && (
+            <button
+              onClick={() => setDeleteModalOpen(true)}
+              className="p-1 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+              title="Delete Widget"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           )}
 
           <button
@@ -332,14 +460,14 @@ export function WidgetCard({ spec, rows }: WidgetCardProps) {
             className="p-1 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
             title="Why this chart?"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-3.5 h-3.5" />
           </button>
 
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setShowTable(!showTable)}
-            className="h-7 w-7 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            className="h-7 w-7 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 ml-0.5"
             title={showTable ? "Switch to Chart View" : "Switch to Table Alternative"}
           >
             {showTable ? <BarChart2 className="w-3.5 h-3.5" /> : <TableIcon className="w-3.5 h-3.5" />}
@@ -397,6 +525,36 @@ export function WidgetCard({ spec, rows }: WidgetCardProps) {
             <p><strong>Dimension:</strong> {spec.dimensionField || "None"}</p>
             <p><strong>Measure:</strong> {spec.measureField || "None"}</p>
             <p><strong>Aggregation:</strong> {spec.aggregation.toUpperCase()}</p>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Delete Chart Widget"
+        description="Are you sure you want to remove this chart from your dashboard?"
+        maxWidth="sm"
+      >
+        <div className="space-y-4 text-xs">
+          <p className="text-slate-600 dark:text-slate-300">
+            Removing &ldquo;{spec.title}&rdquo; will delete it from this view. You can re-add it anytime from the Add Widget button.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                setDeleteModalOpen(false);
+                onDelete?.(spec.id);
+              }}
+            >
+              Delete Widget
+            </Button>
           </div>
         </div>
       </Modal>

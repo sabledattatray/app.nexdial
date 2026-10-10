@@ -10,8 +10,9 @@ import { openDB, IDBPDatabase } from "idb";
 import { DatasetProfile, RowData, TransformationStep } from "@/domain/dataset/types";
 
 const DB_NAME = "openmis_local_storage";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const DATASET_STORE = "active_datasets";
+const REPORT_STORE = "saved_reports";
 
 export interface StoredSession {
   id: string;
@@ -30,6 +31,9 @@ async function getDatabase(): Promise<IDBPDatabase> {
     upgrade(db) {
       if (!db.objectStoreNames.contains(DATASET_STORE)) {
         db.createObjectStore(DATASET_STORE, { keyPath: "id" });
+      }
+      if (!db.objectStoreNames.contains(REPORT_STORE)) {
+        db.createObjectStore(REPORT_STORE, { keyPath: "id" });
       }
     },
   });

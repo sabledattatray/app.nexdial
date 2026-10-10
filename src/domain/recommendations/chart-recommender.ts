@@ -27,7 +27,7 @@ export interface ChartWidgetSpec {
   secondaryMeasureField?: string;
   aggregation: AggregationType;
   topN?: number;
-  whyThisChart: string;
+  whyThisChart?: string;
   gridSpan: "full" | "half" | "quarter";
 }
 
