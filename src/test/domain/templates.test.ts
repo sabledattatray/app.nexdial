@@ -44,4 +44,26 @@ describe("MIS Templates Registry (Phase 9 Expansion - 22+ Templates)", () => {
       }
     }
   });
+
+  it("ensures THEME_PALETTES provides complete color configurations for all 8 template themes", async () => {
+    const { THEME_PALETTES, formatChartValue } = await import("@/components/charts/WidgetCard");
+    const validThemes = ["indigo", "emerald", "blue", "violet", "amber", "rose", "cyan", "slate"] as const;
+
+    for (const theme of validThemes) {
+      const palette = THEME_PALETTES[theme];
+      expect(palette, `Missing palette for ${theme}`).toBeDefined();
+      expect(palette.primary.startsWith("#")).toBe(true);
+      expect(palette.secondary.startsWith("#")).toBe(true);
+      expect(palette.accent.startsWith("#")).toBe(true);
+      expect(palette.gradientTop.startsWith("#")).toBe(true);
+      expect(palette.gradientBottom.startsWith("#")).toBe(true);
+      expect(palette.donutPalette.length).toBeGreaterThanOrEqual(6);
+      expect(palette.kpiBorder.length).toBeGreaterThan(0);
+    }
+
+    // Verify formatChartValue formats numbers accurately for bar & donut labels
+    expect(formatChartValue(1_500_000)).toBe("1.5M");
+    expect(formatChartValue(45_000)).toBe("45.0k");
+    expect(formatChartValue(850)).toBe("850");
+  });
 });

@@ -56,9 +56,20 @@ import { TemplateSwitcherBar } from "@/components/templates/TemplateSwitcherBar"
 import { TemplateSlideOverDrawer } from "@/components/templates/TemplateSlideOverDrawer";
 import { PopularTemplatesBar } from "@/components/templates/PopularTemplatesBar";
 import { TemplatesRightSidebar } from "@/components/templates/TemplatesRightSidebar";
-import { MIS_TEMPLATES, MISTemplate } from "@/lib/templates/template-registry";
+import { MIS_TEMPLATES, MISTemplate, TemplateColorTheme } from "@/lib/templates/template-registry";
 import { parseCsvString } from "@/lib/parsers/csv-parser";
 import { profileDataset } from "@/domain/dataset/profiler";
+
+const COLOR_THEME_OPTIONS: { id: TemplateColorTheme; name: string; hex: string }[] = [
+  { id: "indigo", name: "Indigo", hex: "#6366f1" },
+  { id: "emerald", name: "Emerald", hex: "#10b981" },
+  { id: "blue", name: "Blue", hex: "#3b82f6" },
+  { id: "violet", name: "Violet", hex: "#8b5cf6" },
+  { id: "amber", name: "Amber", hex: "#f59e0b" },
+  { id: "rose", name: "Rose", hex: "#f43f5e" },
+  { id: "cyan", name: "Cyan", hex: "#06b6d4" },
+  { id: "slate", name: "Slate", hex: "#64748b" },
+];
 
 export default function ReportDashboardPage() {
   const { profile, rows, isLoading, setLoadedDataset } = useDataset();
@@ -67,7 +78,17 @@ export default function ReportDashboardPage() {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+  const [selectedColorTheme, setSelectedColorTheme] = useState<TemplateColorTheme | null>(null);
   const [loadingTemplateId, setLoadingTemplateId] = useState<string | null>(null);
+
+  const activeColorTheme: TemplateColorTheme = useMemo(() => {
+    if (selectedColorTheme) return selectedColorTheme;
+    if (activeTemplateId) {
+      const tmpl = MIS_TEMPLATES.find((t) => t.id === activeTemplateId);
+      if (tmpl?.colorTheme) return tmpl.colorTheme;
+    }
+    return "indigo";
+  }, [selectedColorTheme, activeTemplateId]);
 
   // 1. Default recommendations
   const defaultWidgets = useMemo(() => {
@@ -224,6 +245,7 @@ export default function ReportDashboardPage() {
     setCustomTitle(null);
     setFilters([]);
     setActiveTemplateId(null);
+    setSelectedColorTheme(null);
     setHasUnsavedChanges(true);
   };
 
@@ -290,6 +312,7 @@ export default function ReportDashboardPage() {
     setCustomWidgets(mappedWidgets);
     setCustomTitle(`${template.name} • ${profile.metadata.name}`);
     setActiveTemplateId(template.id);
+    setSelectedColorTheme(template.colorTheme);
     setHasUnsavedChanges(true);
     setSaveSuccessMessage(`Applied "${template.name}" layout! Live report updated.`);
     setTimeout(() => setSaveSuccessMessage(null), 4000);
@@ -341,6 +364,7 @@ export default function ReportDashboardPage() {
       setCustomWidgets(templateWidgets);
       setCustomTitle(template.name);
       setActiveTemplateId(template.id);
+      setSelectedColorTheme(template.colorTheme);
       setFilters([]);
       setHasUnsavedChanges(false);
       setSaveSuccessMessage(
@@ -771,15 +795,53 @@ export default function ReportDashboardPage() {
               </span>
             </div>
 
-            {activeTemplateId && (
-              <div className="pt-1 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            {/* Active Template & Palette Indicator */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-200">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+                  style={{
+                    backgroundColor:
+                      COLOR_THEME_OPTIONS.find((c) => c.id === activeColorTheme)?.hex || "#6366f1",
+                  }}
+                />
                 <span>
-                  Active Layout:{" "}
-                  <strong>{MIS_TEMPLATES.find((t) => t.id === activeTemplateId)?.name}</strong>
+                  {activeTemplateId ? (
+                    <>
+                      Active Layout:{" "}
+                      <strong>
+                        {MIS_TEMPLATES.find((t) => t.id === activeTemplateId)?.name}
+                      </strong>
+                    </>
+                  ) : (
+                    "Standard MIS Layout"
+                  )}
                 </span>
               </div>
-            )}
+
+              {/* Instant Color Theme Switcher */}
+              <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-800">
+                <span className="text-[10px] uppercase font-bold text-slate-400">Theme:</span>
+                <div className="flex items-center gap-1">
+                  {COLOR_THEME_OPTIONS.map((c) => {
+                    const isSelected = activeColorTheme === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedColorTheme(c.id)}
+                        className={`w-3.5 h-3.5 rounded-full transition-all duration-150 ${
+                          isSelected
+                            ? "scale-125 ring-2 ring-offset-1 ring-slate-900 dark:ring-white shadow-xs"
+                            : "hover:scale-110 opacity-70 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: c.hex }}
+                        title={`${c.name} Theme${isSelected ? " (Active)" : ""}`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Column (Fills the blank area): 5 Popular Templates + Dropdown Option */}
@@ -830,6 +892,7 @@ export default function ReportDashboardPage() {
                 key={kpi.id}
                 spec={kpi}
                 rows={filteredRows}
+                colorTheme={activeColorTheme}
                 onEdit={handleOpenEditWidget}
                 onDuplicate={handleDuplicateWidget}
                 onDelete={handleDeleteWidget}
@@ -954,6 +1017,7 @@ export default function ReportDashboardPage() {
                   <WidgetCard
                     spec={spec}
                     rows={filteredRows}
+                    colorTheme={activeColorTheme}
                     onEdit={handleOpenEditWidget}
                     onDuplicate={handleDuplicateWidget}
                     onDelete={handleDeleteWidget}

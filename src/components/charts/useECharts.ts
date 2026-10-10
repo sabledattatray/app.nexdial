@@ -13,12 +13,21 @@ export function useECharts({ options }: UseEChartsOptions) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
 
+  const prevThemeRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
     // Detect if dark mode is active
     const isDark = document.documentElement.classList.contains("dark");
     const chartTheme = isDark ? "dark" : undefined;
+
+    // Dispose old instance if theme toggled so correct colors/palette are mounted
+    if (chartInstanceRef.current && prevThemeRef.current !== chartTheme) {
+      chartInstanceRef.current.dispose();
+      chartInstanceRef.current = null;
+    }
+    prevThemeRef.current = chartTheme;
 
     // Initialize ECharts instance
     if (!chartInstanceRef.current) {
