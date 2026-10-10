@@ -60,7 +60,18 @@ export function AppHeader({ datasetName: propName, rowCount: propRows }: AppHead
 
   const toggleDarkMode = () => {
     if (typeof document !== "undefined") {
-      document.documentElement.classList.toggle("dark");
+      const isCurrentlyDark = document.documentElement.classList.contains("dark");
+      if (isCurrentlyDark) {
+        document.documentElement.classList.remove("dark");
+        try {
+          localStorage.setItem("openmis-theme", "light");
+        } catch {}
+      } else {
+        document.documentElement.classList.add("dark");
+        try {
+          localStorage.setItem("openmis-theme", "dark");
+        } catch {}
+      }
       window.dispatchEvent(new Event("openmis-theme-change"));
     }
   };
